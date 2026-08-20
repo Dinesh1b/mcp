@@ -1,7 +1,12 @@
 """
-agent/reporter.py — QA report generation.
+agent/reporter.py — Multi-Level QA Report Generation.
 
-Generates structured QA reports in Markdown and JSON formats.
+Implements Phase 7:
+Generates structured QA reports in Markdown and JSON formats, clearly separating:
+1. Validated Results (PASS / FAIL)
+2. Exploratory Findings (OBSERVED / UNVERIFIABLE)
+3. Documentation Discrepancies (Doc vs Live App conflicts)
+4. Defect Classifications & Evidence
 """
 
 from __future__ import annotations
@@ -12,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from config.settings import settings
-from utils.helpers import format_table
+from agent.memory_store import ModuleMemoryStore
 
 
 def generate_report(
@@ -22,29 +27,34 @@ def generate_report(
 ) -> Path:
     """
     Generate a structured QA report and save it to the reports directory.
-
-    Returns:
-        Path to the generated Markdown report.
     """
     settings.ensure_dirs()
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     module = test_plan.get("module", "Unknown")
     feature = test_plan.get("feature", "Unknown")
+    doc_status = test_plan.get("doc_status", "DOCUMENTED")
 
     report_path = settings.report_dir / f"QA_Report_{module}_{timestamp}.md"
     json_path = settings.report_dir / f"QA_Report_{module}_{timestamp}.json"
 
     # Compute summary stats
     total = len(results)
-    passed = sum(1 for r in results if r["status"] == "PASS")
-    failed = sum(1 for r in results if r["status"] == "FAIL")
-    blocked = sum(1 for r in results if r["status"] == "BLOCKED")
-    skipped = sum(1 for r in results if r["status"] == "SKIPPED")
+    passed = sum(1 for r in results if r.get("status") == "PASS")
+    failed = sum(1 for r in results if r.get("status") == "FAIL")
+    observed = sum(1 for r in results if r.get("status") == "OBSERVED")
+    unverifiable = sum(1 for r in results if r.get("status") == "UNVERIFIABLE")
+    discrepancies = sum(1 for r in results if r.get("status") == "DISCREPANCY")
+    blocked = sum(1 for r in results if r.get("status") == "BLOCKED")
+    gap = sum(1 for r in results if r.get("status") == "GAP")
+
+    # Retrieve persistent discrepancies from module memory
+    memory = ModuleMemoryStore(module)
+    stored_discrepancies = memory.state.get("discrepancies", [])
 
     # Collect confirmed defects
     defects = [
         r for r in results
-        if r["status"] == "FAIL" and r.get("failure_analysis", {}).get("failure_type") == "application_defect"
+        if r.get("status") == "FAIL" and r.get("failure_analysis", {}).get("failure_type") == "application_defect"
     ]
 
     severity_counts: dict[str, int] = {"critical": 0, "high": 0, "medium": 0, "low": 0}
@@ -56,14 +66,19 @@ def generate_report(
         requirement=requirement,
         module=module,
         feature=feature,
+        doc_status=doc_status,
         timestamp=timestamp,
         total=total,
         passed=passed,
         failed=failed,
+        observed=observed,
+        unverifiable=unverifiable,
+        discrepancies_count=discrepancies,
         blocked=blocked,
-        skipped=skipped,
+        gap=gap,
         results=results,
         defects=defects,
+        stored_discrepancies=stored_discrepancies,
         severity_counts=severity_counts,
     )
 
@@ -72,15 +87,21 @@ def generate_report(
         json.dumps(
             {
                 "requirement": requirement,
-                "test_plan": test_plan,
-                "results": results,
+                "module": module,
+                "doc_status": doc_status,
+                "timestamp": timestamp,
                 "summary": {
                     "total": total,
                     "passed": passed,
                     "failed": failed,
+                    "observed": observed,
+                    "unverifiable": unverifiable,
+                    "discrepancies": discrepancies,
                     "blocked": blocked,
-                    "skipped": skipped,
+                    "gap": gap,
                 },
+                "results": results,
+                "discrepancies": stored_discrepancies,
                 "defects": defects,
             },
             indent=2,
@@ -97,97 +118,111 @@ def _build_markdown(
     requirement: str,
     module: str,
     feature: str,
+    doc_status: str,
     timestamp: str,
     total: int,
     passed: int,
     failed: int,
+    observed: int,
+    unverifiable: int,
+    discrepancies_count: int,
     blocked: int,
-    skipped: int,
+    gap: int,
     results: list[dict[str, Any]],
     defects: list[dict[str, Any]],
+    stored_discrepancies: list[dict[str, Any]],
     severity_counts: dict[str, int],
 ) -> str:
     lines = [
-        f"# QA Report — {module} / {feature}",
+        f"# Stockount QA Report — {module} [{doc_status}]",
         f"",
         f"**Generated:** {timestamp}  ",
-        f"**Requirement:** {requirement}",
+        f"**Requirement:** {requirement}  ",
+        f"**Feature:** {feature}  ",
+        f"**Documentation Status:** `{doc_status}`",
         f"",
         "---",
         "",
-        "## Test Summary",
+        "## Summary Metrics",
         "",
-        f"| Metric   | Count |",
-        f"|----------|-------|",
-        f"| Total    | {total} |",
-        f"| ✅ Passed  | {passed} |",
-        f"| ❌ Failed  | {failed} |",
-        f"| 🚫 Blocked | {blocked} |",
-        f"| ⏭️ Skipped | {skipped} |",
-        "",
-        "## Defect Summary",
-        "",
-        f"| Severity | Count |",
-        f"|----------|-------|",
-        f"| 🔴 Critical | {severity_counts.get('critical', 0)} |",
-        f"| 🟠 High     | {severity_counts.get('high', 0)} |",
-        f"| 🟡 Medium   | {severity_counts.get('medium', 0)} |",
-        f"| 🔵 Low      | {severity_counts.get('low', 0)} |",
+        f"| Category | Count | Status Description |",
+        f"|---|---|---|",
+        f"| Total Steps / Scenarios | {total} | Overall execution items |",
+        f"| ✅ Validated (PASS) | {passed} | Actual live behavior matched reference docs |",
+        f"| ❌ Failed (FAIL) | {failed} | Confirmed functional/technical failure |",
+        f"| 🔍 Exploratory (OBSERVED) | {observed} | Observed live app behavior (undocumented area) |",
+        f"| ❓ Unverifiable | {unverifiable} | Could not verify against spec |",
+        f"| ⚠️ Doc Discrepancies | {discrepancies_count} | Live app diverged from reference docs |",
+        f"| 🚫 Blocked | {blocked} | Execution blocked by dependencies/errors |",
+        f"| 📋 Requirement Gap | {gap} | Ambiguous requirements |",
         "",
         "---",
         "",
-        "## Test Results",
+        "## Execution Details",
         "",
+        "| ID | Step / Scenario | Doc Status | Status | Actual Live Behavior / Finding |",
+        "|---|---|---|---|---|",
     ]
 
-    # Results table
-    table_rows = []
     for r in results:
-        status_icon = {
+        status = r.get("status", "PASS")
+        status_badge = {
             "PASS": "✅ PASS",
             "FAIL": "❌ FAIL",
+            "OBSERVED": "🔍 OBSERVED",
+            "UNVERIFIABLE": "❓ UNVERIFIABLE",
+            "DISCREPANCY": "⚠️ DISCREPANCY",
             "BLOCKED": "🚫 BLOCKED",
-            "SKIPPED": "⏭️ SKIPPED",
-        }.get(r["status"], r["status"])
+            "GAP": "📋 GAP",
+        }.get(status, status)
 
-        table_rows.append(
-            f"| {r['id']} | {r['title'][:50]} | {r['type']} | {status_icon} | {r['actual_result'][:80]} |"
-        )
+        doc_tag = r.get("doc_status", doc_status)
+        actual = (r.get("actual_result") or "").replace("\n", " ")[:100]
+        lines.append(f"| {r.get('id', 'TC')} | {r.get('title', '')[:45]} | `{doc_tag}` | {status_badge} | {actual} |")
 
-    lines.append("| TC ID | Scenario | Type | Status | Actual Result |")
-    lines.append("|-------|----------|------|--------|---------------|")
-    lines.extend(table_rows)
-    lines.append("")
-    lines.append("---")
     lines.append("")
 
-    # Defect details
+    # Documentation Discrepancies Section
+    if stored_discrepancies:
+        lines += [
+            "---",
+            "",
+            "## ⚠️ Documentation vs. Live App Discrepancies",
+            "",
+            "> The following mismatches between reference documentation and actual live-app behavior were recorded:",
+            "",
+        ]
+        for i, disc in enumerate(stored_discrepancies[-5:], 1):
+            lines += [
+                f"### Discrepancy #{i:02d}: {disc.get('title')}",
+                f"- **Documented Expectation:** {disc.get('documented_expectation')}",
+                f"- **Live Application Behavior:** {disc.get('actual_behavior')}",
+                f"- **Recorded At:** {disc.get('recorded_at')}",
+                "",
+            ]
+
+    # Confirmed Defects Section
     if defects:
-        lines.append("## Confirmed Defects")
-        lines.append("")
+        lines += [
+            "---",
+            "",
+            "## ❌ Confirmed Defects",
+            "",
+        ]
         for i, d in enumerate(defects, 1):
             fa = d.get("failure_analysis") or {}
             dc = d.get("defect_classification") or {}
             lines += [
-                f"### Bug {i:03d} — {d['title']}",
-                "",
-                f"**TC ID:** {d['id']}  ",
-                f"**Severity:** {dc.get('severity', 'N/A')}  ",
-                f"**Priority:** {dc.get('priority', 'N/A')}  ",
-                f"**Failure Type:** {fa.get('failure_type', 'N/A')}  ",
-                f"**Reproducible:** {fa.get('reproducible', 'N/A')}  ",
-                "",
-                f"**Actual Result:** {d.get('actual_result', '')}",
-                "",
-                f"**Explanation:** {fa.get('explanation', '')}",
-                "",
-                f"**Suggested Investigation:** {fa.get('suggested_investigation', '')}",
-                "",
-                f"**Evidence:** {', '.join(d.get('evidence', [])) or 'None'}",
-                "",
-                "---",
+                f"### Defect #{i:02d} — {d['title']}",
+                f"- **Scenario ID:** {d['id']}",
+                f"- **Severity:** `{dc.get('severity', 'medium').upper()}`",
+                f"- **Failure Type:** {fa.get('failure_type', 'N/A')}",
+                f"- **Actual Result:** {d.get('actual_result', '')}",
+                f"- **Explanation:** {fa.get('explanation', '')}",
+                f"- **Evidence:** {', '.join(d.get('evidence', [])) or 'None'}",
                 "",
             ]
 
-    lines.append("*Report generated by AI QA Agent*")
+    lines.append("---")
+    lines.append("*Report generated by Stockount AI QA Agent (Antigravity + Gemini + MCP + Playwright)*")
     return "\n".join(lines)

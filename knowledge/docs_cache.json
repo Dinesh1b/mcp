@@ -1,0 +1,178 @@
+[
+  {
+    "url": "https://docs.stockount.com/docs/category/setup-and-configuration",
+    "title": "Setup and Configuration",
+    "category": "setup-and-configuration",
+    "content_raw": "Setup and Configuration | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Company and Branch Configuration Adding User Role Access Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Setup and Configuration Setup and Configuration The Business Setup Module is essential for initializing the Stockount application. Users must add Company, Branch, Role, Role Access, User, Storage, Tax, Auto Numbering and Inventory details to begin utilizing the platform. \ud83d\udcc4\ufe0f Company and Branch Configuration To ensure smooth operations and proper documentation, follow these steps to add company details: \ud83d\udcc4\ufe0f Adding User The User Module enables the addition of users and management of their roles and access levels within the system. \ud83d\udcc4\ufe0f Role Access Efficient role management ensures secure and streamlined user access control. Follow the steps below to create roles and assign role access permissions. Previous Interface Overview Next Company and Branch Configuration Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved.",
+    "elements": [],
+    "actions": [
+      "Setup and Configuration | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Company and Branch Configuration Adding User Role Access Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Setup and Configuration Setup and Configuration The Business Setup Module is essential for initializing the Stockount application",
+      "Follow the steps below to create roles and assign role access permissions"
+    ],
+    "validations": [
+      "Users must add Company, Branch, Role, Role Access, User, Storage, Tax, Auto Numbering and Inventory details to begin utilizing the platform"
+    ],
+    "apis": [],
+    "expected_results": [],
+    "doc_status": "DOCUMENTED"
+  },
+  {
+    "url": "https://docs.stockount.com/docs/category/getting-started",
+    "title": "Getting Started",
+    "category": "getting-started",
+    "content_raw": "Getting Started | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started System Requirements Account Setup Interface Overview Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Getting Started Getting Started The Getting Started section of this user guide is designed to help you take your first steps with Stockount. Whether you&#x27;re a new user or setting up your organization for the first time, this section provides all the foundational knowledge you need to get up and running quickly and efficientlys. \ud83d\udcc4\ufe0f System Requirements Web Application Requirements \ud83d\udcc4\ufe0f Account Setup How to Create a Login \ud83d\udcc4\ufe0f Interface Overview Post-Login Navigation Previous Introduction to Stockount Next System Requirements Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved.",
+    "elements": [],
+    "actions": [
+      "Getting Started | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started System Requirements Account Setup Interface Overview Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Getting Started Getting Started The Getting Started section of this user guide is designed to help you take your first steps with Stockount",
+      "\ud83d\udcc4\ufe0f System Requirements Web Application Requirements \ud83d\udcc4\ufe0f Account Setup How to Create a Login \ud83d\udcc4\ufe0f Interface Overview Post-Login Navigation Previous Introduction to Stockount Next System Requirements Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved"
+    ],
+    "validations": [],
+    "apis": [],
+    "expected_results": [],
+    "doc_status": "DOCUMENTED"
+  },
+  {
+    "url": "https://docs.stockount.com/docs/Sk-Mobile",
+    "title": "Mobile Application User Guide",
+    "category": "general",
+    "content_raw": "Mobile Application User Guide | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Mobile Application User Guide On this page Mobile Application User Guide The application can be downloaded from the App Store and Play Store. Login Process \u200b After the Welcome Page, you will be navigated to the Login Page. Log in using your provided credentials. Note: There is no provision to sign up or change the password within the mobile app. Performing an Audit \u200b To perform an audit: Navigate to the Audit Module \u200b Upon login, select the Audit Module. You will see a list of ongoing audits assigned to you. Use the search functionality to locate an audit by its name or select an Audit Plan. Choose Audit Mode \u200b You will land on the Manual Mode by default. Audits can be performed in three modes: Manual Mode Scanner Mode Camera Mode Steps to Perform the Audit \u200b Step 1: Update Your Location \u200b Update your current location by clicking on the Location button. Step 2: Select Items \u200b Search for the item by entering the Item Code or Name. The Item Location will be populated automatically. Step 3: Performing the Audit \u200b 1. Manual Mode: Manually increase the product count. Switch between different products manually. 2. Scanner Mode: Scan the Item Code to increase the count. Scan additional items to update their respective counts. 3. Camera Mode: Use the camera to capture the barcode. The capture will trigger automatically every 3 seconds. Additional Features in All Modes \u200b Photo Confirmation: If an item requires photo confirmation, the Camera Icon will be enabled. Take multiple photos as needed. Damaged Quantity: If the audit includes damaged quantity tracking, the Damaged Quantity field will be enabled. Clearing Quantity: If you have miscounted the quantity, use the Clear Option to reset the count. Recently Audited Items: View recently audited items and their quantities in the Audited Stock Item section. Audit Report: Click the Audit Report button to view the detailed report for a particular item. Completing the Audit \u200b Select the three dots on the top-right corner of the screen. Click &quot;Complete Audit&quot; on the pop-up menu. You will be navigated to the Audit Declaration Page, where you can: Select Discrepancy Reasons (if applicable): Theft Misplaced Inward Sale Error If there is no discrepancy, click the &quot;Complete Audit&quot; button. Performing a Cross Audit \u200b If you are assigned as a Cross Auditor: Navigate to the Cross Audit section \u200b Click the three lines (menu icon) on the header to access the Cross Audit module. Select and Perform the Cross Audit \u200b The assigned cross audits will be listed. Select an audit, and you will be navigated to the Cross Audit Page. Choose the Location being audited. Use the Right and Left Arrow icons to navigate between items under the selected location. Cross Auditing Items \u200b Increase the quantity of items as needed. Track Damaged Quantities if applicable. Use the Clear Option to reset cross-audited quantities. View Summary and Complete Audit \u200b Click &quot;View Summary&quot; to review the quantities audited. Once satisfied, click &quot;Complete Cross Audit&quot; to finalize. Disclaimer \u200b Currently, only the Audit Module is supported in the mobile application. Additional modules will be introduced in future updates. Previous Audit History Next Best Practices for Inventory Audits Login Process Performing an Audit Navigate to the Audit Module Choose Audit Mode Steps to Perform the Audit Additional Features in All Modes Completing the Audit Performing a Cross Audit Navigate to the Cross Audit section Select and Perform the Cross Audit Cross Auditing Items View Summary and Complete Audit Disclaimer Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved.",
+    "elements": [
+      "Audits can be performed in three modes: Manual Mode Scanner Mode Camera Mode Steps to Perform the Audit \u200b Step 1: Update Your Location \u200b Update your current location by clicking on the Location button",
+      "Camera Mode: Use the camera to capture the barcode",
+      "Damaged Quantity: If the audit includes damaged quantity tracking, the Damaged Quantity field will be enabled",
+      "Audit Report: Click the Audit Report button to view the detailed report for a particular item",
+      "You will be navigated to the Audit Declaration Page, where you can: Select Discrepancy Reasons (if applicable): Theft Misplaced Inward Sale Error If there is no discrepancy, click the &quot;Complete Audit&quot; button"
+    ],
+    "actions": [
+      "Mobile Application User Guide | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Mobile Application User Guide On this page Mobile Application User Guide The application can be downloaded from the App Store and Play Store",
+      "Login Process \u200b After the Welcome Page, you will be navigated to the Login Page",
+      "Performing an Audit \u200b To perform an audit: Navigate to the Audit Module \u200b Upon login, select the Audit Module",
+      "You will see a list of ongoing audits assigned to you",
+      "Use the search functionality to locate an audit by its name or select an Audit Plan",
+      "Audits can be performed in three modes: Manual Mode Scanner Mode Camera Mode Steps to Perform the Audit \u200b Step 1: Update Your Location \u200b Update your current location by clicking on the Location button",
+      "Step 2: Select Items \u200b Search for the item by entering the Item Code or Name",
+      "Step 3: Performing the Audit \u200b 1",
+      "Scanner Mode: Scan the Item Code to increase the count",
+      "Scan additional items to update their respective counts",
+      "Audit Report: Click the Audit Report button to view the detailed report for a particular item",
+      "Completing the Audit \u200b Select the three dots on the top-right corner of the screen",
+      "Click &quot;Complete Audit&quot; on the pop-up menu",
+      "You will be navigated to the Audit Declaration Page, where you can: Select Discrepancy Reasons (if applicable): Theft Misplaced Inward Sale Error If there is no discrepancy, click the &quot;Complete Audit&quot; button",
+      "Performing a Cross Audit \u200b If you are assigned as a Cross Auditor: Navigate to the Cross Audit section \u200b Click the three lines (menu icon) on the header to access the Cross Audit module"
+    ],
+    "validations": [
+      "Disclaimer \u200b Currently, only the Audit Module is supported in the mobile application"
+    ],
+    "apis": [],
+    "expected_results": [],
+    "doc_status": "DOCUMENTED"
+  },
+  {
+    "url": "https://docs.stockount.com/docs/category/performing-audit",
+    "title": "Performing Audit",
+    "category": "audit",
+    "content_raw": "Performing Audit | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Ongoing Audits Audit History Mobile Application User Guide Best Practices for Inventory Audits Appendix Performing Audit Performing Audit The Audits submodule organised into two main sections: Ongoing Audits and Audit History. It covers functionalities for auditing, cross-auditing, and managing audit records. The module includes features for ongoing audits, audit history, and specific for stock auditors, cross-auditors, and audit owners.For reference, See the below Figure which illustrates this process. \ud83d\udcc4\ufe0f Ongoing Audits This section displays the latest audit plans currently in progress in a table format. \ud83d\udcc4\ufe0f Audit History This section contains a list of completed audits, providing a historical overview of past audit plans. We just see the completed audit details. We can\u2019t able to edit the audit. Previous Different Audit Types and Frequencies Next Ongoing Audits Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved.",
+    "elements": [
+      "\ud83d\udcc4\ufe0f Ongoing Audits This section displays the latest audit plans currently in progress in a table format"
+    ],
+    "actions": [
+      "Performing Audit | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Ongoing Audits Audit History Mobile Application User Guide Best Practices for Inventory Audits Appendix Performing Audit Performing Audit The Audits submodule organised into two main sections: Ongoing Audits and Audit History"
+    ],
+    "validations": [],
+    "apis": [],
+    "expected_results": [
+      "\ud83d\udcc4\ufe0f Audit History This section contains a list of completed audits, providing a historical overview of past audit plans",
+      "We just see the completed audit details"
+    ],
+    "doc_status": "DOCUMENTED"
+  },
+  {
+    "url": "https://docs.stockount.com/docs/Appendix",
+    "title": "Appendix",
+    "category": "general",
+    "content_raw": "Appendix | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Appendix On this page Appendix Appendix: Glossary of Terms 1. Audit \u200b Term and Description \u200b Inventory Audit A systematic examination of a company&#x27;s inventory records and physical stock to ensure accuracy and compliance. Stock Item A product or material listed in the inventory for auditing and management. Audit Plan A structured schedule or set of tasks outlining the scope, objectives, and timeline for conducting an inventory audit. Auditor A person responsible for verifying inventory accuracy by inspecting and reconciling stock records. Cross Auditor A secondary auditor tasked with independently reviewing and validating the work of the primary auditor for accuracy. Audit Owner The individual accountable for overseeing the entire audit process, assigning tasks, and ensuring completion. Physical Stock Count The manual counting of inventory items to verify records against the actual stock. Reconciliation Matching physical stock counts with inventory records to identify discrepancies. Variance The difference between recorded stock levels and physically counted stock. Perpetual Inventory System An inventory method where stock levels are updated in real-time as transactions occur. Cycle Counting A continuous process of auditing subsets of inventory, rather than a full inventory at once. Stock Keeping Unit (SKU) A unique code assigned to inventory items for identification and tracking purposes. Barcode Scanning The process of using a scanner to read barcode labels for quick identification of stock items. Discrepancy Report A document outlining differences or inconsistencies found between inventory records and physical counts. 2. Barcode Format Recommendations \u200b Code 128 High density and ideal for inventory applications. Supports alphanumeric characters. QR Codes Suitable for including additional data such as location or batch details. EAN-13 A standard barcode format for retail items with numeric data. Previous Best Practices for Inventory Audits 1. Audit Term and Description 2. Barcode Format Recommendations Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved.",
+    "elements": [
+      "Audit Owner The individual accountable for overseeing the entire audit process, assigning tasks, and ensuring completion",
+      "Barcode Scanning The process of using a scanner to read barcode labels for quick identification of stock items",
+      "Barcode Format Recommendations \u200b Code 128 High density and ideal for inventory applications",
+      "QR Codes Suitable for including additional data such as location or batch details",
+      "EAN-13 A standard barcode format for retail items with numeric data",
+      "Barcode Format Recommendations Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved"
+    ],
+    "actions": [
+      "Appendix | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Appendix On this page Appendix Appendix: Glossary of Terms 1",
+      "Audit Owner The individual accountable for overseeing the entire audit process, assigning tasks, and ensuring completion",
+      "Stock Keeping Unit (SKU) A unique code assigned to inventory items for identification and tracking purposes",
+      "Barcode Scanning The process of using a scanner to read barcode labels for quick identification of stock items"
+    ],
+    "validations": [],
+    "apis": [],
+    "expected_results": [],
+    "doc_status": "DOCUMENTED"
+  },
+  {
+    "url": "https://docs.stockount.com/docs/intro",
+    "title": "Introduction to Stockount",
+    "category": "general",
+    "content_raw": "Introduction to Stockount | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Introduction to Stockount Introduction to Stockount Who are we? We understand the challenges faced by small and medium-sized businesses that deal with physical goods. Whether you operate a retail shop, a distribution center, or trade goods in any form of packaging, you know the importance of accurate inventory management. Maintaining accurate stock levels is crucial, especially when operating across multiple locations or with various staff handling inventory. Discrepancies between physical and recorded stock can lead to significant financial losses. Excess stock ties up capital and can result in spoilage or obsolescence, while stock shortages lead to lost sales and dissatisfied customers. These discrepancies can arise from various factors, including theft, incorrect billing or dispatch, inaccurate deliveries, and general mishandling. Often, casual handling and internal theft contribute significantly to these losses. Over time, these seemingly minor discrepancies accumulate, impacting profitability and, in some cases, even leading to business closure. Traditionally, businesses have often budgeted for these losses, accepting them as an unavoidable cost due to the lack of a reliable solution. Traditional stocktaking methods are manual, time-consuming, and resource-intensive. They require significant manpower, generate vast amounts of paperwork, and are prone to human error, leading to inaccurate results. Moreover, these audits often necessitate business closures, resulting in lost revenue. We recognize these pain points and have developed a solution to address them directly. What solution we offer? We offer Stockount, a web and mobile application designed to streamline and automate the inventory counting process, providing businesses like yours with greater control and accuracy. Stockount empowers you to: Automate regular stocktakes: Schedule frequent counts to maintain accurate stock levels without constant manual intervention. Implement checks and balances: Assign third-party cross-checks and sampling to ensure audit integrity. Capture photographic evidence: Document the state of your inventory for added accountability. Instill inventory discipline: Promote a culture of accurate record-keeping and responsible handling. Conduct perpetual audits: Perform stocktakes in fragments, minimizing disruption to business operations. Generate instant reconciliation reports: Gain immediate insights into stock discrepancies with a single click. Monitor for consistency: Track variations across audits to identify potential issues early. Perform remote audits: Conduct stocktakes efficiently in multiple locations using a mobile app. Utilize barcode and QR code scanning: Simplify data entry and improve accuracy. Manage unlabelled inventory: Generate labels and barcodes for comprehensive tracking. Map storage locations: Identify misplaced items quickly and efficiently. Audit assets and equipment: Extend the benefits of Stockount beyond just inventory. How can you benefit? With Stockount, you can: Reduce losses from stock discrepancies. Gain a clear, real-time view of your inventory for better decision-making. Improve your bottom line by minimizing stockouts and overstocking. Boost customer satisfaction by ensuring product availability. Increase operational efficiency with automated inventory management. Save time and resources compared to traditional manual stocktaking methods. Promote a culture of accountability within your team. How robust are our solutions? Stockount is designed for reliability and security. Here&#x27;s what makes our solution robust: Cloud-based architecture: Ensures data accessibility and real-time updates. Offline functionality: Enables stocktaking even with limited internet connectivi",
+    "elements": [
+      "Utilize barcode and QR code scanning: Simplify data entry and improve accuracy",
+      "Manage unlabelled inventory: Generate labels and barcodes for comprehensive tracking"
+    ],
+    "actions": [
+      "Introduction to Stockount | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Introduction to Stockount Introduction to Stockount Who are we? We understand the challenges faced by small and medium-sized businesses that deal with physical goods",
+      "Whether you operate a retail shop, a distribution center, or trade goods in any form of packaging, you know the importance of accurate inventory management",
+      "Implement checks and balances: Assign third-party cross-checks and sampling to ensure audit integrity",
+      "Conduct perpetual audits: Perform stocktakes in fragments, minimizing disruption to business operations",
+      "Generate instant reconciliation reports: Gain immediate insights into stock discrepancies with a single click",
+      "Perform remote audits: Conduct stocktakes efficiently in multiple locations using a mobile app",
+      "Utilize barcode and QR code scanning: Simplify data entry and improve accuracy"
+    ],
+    "validations": [],
+    "apis": [],
+    "expected_results": [],
+    "doc_status": "DOCUMENTED"
+  },
+  {
+    "url": "https://docs.stockount.com/docs/Best-Practice",
+    "title": "Best Practices for Inventory Audits",
+    "category": "general",
+    "content_raw": "Best Practices for Inventory Audits | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Best Practices for Inventory Audits On this page Best Practices for Inventory Audits A. How to Schedule Regular Inventory Audits \u200b Scheduling regular inventory audits is crucial for maintaining accurate stock records, preventing losses, and optimizing inventory management. Define Objectives: Clarify Purpose: Determine the reason for audits (e.g., accuracy, compliance, loss prevention). Set Goals: Outline measurable goals (e.g., reducing discrepancies, improving inventory turnover). Choose the Frequency: Periodic Audits: Quarterly or yearly for a comprehensive review. Cyclic Audits: Regular checks on smaller portions of inventory (e.g., weekly or monthly). Event-Driven Audits: After significant events (e.g., new product launch, promotions, warehouse relocations). Prepare a Calendar: Create a Schedule: Use tools like Excel, Google Calendar, or inventory management software. Avoid Peak Times: Schedule audits during slower business periods. Assign Responsibilities: Designate Auditors: Choose employees or hire external auditors. Provide Training: Ensure the team understands auditing techniques and tools. Choose the Audit Method: Physical Counting: Manual count of items. Cycle Counting: Focuses on specific inventory sections at intervals. Technology-Assisted: Use barcode scanners, RFID, or inventory software. Gather Tools and Data: Inventory Management System: Ensure it&#x27;s up-to-date. Documentation: Prepare count sheets, stock records, and discrepancy reports. Tools: Ensure scanners and handheld devices are operational. Conduct the Audit: Plan Workflow: Divide inventory into manageable sections. Record Findings: Document quantities and compare them to system records. Note Discrepancies: Investigate variances immediately. Analyze Results: Identify Issues: Pinpoint root causes of discrepancies (e.g., theft, mismanagement, errors). Generate Reports: Share findings with stakeholders. Implement Improvements: Adjust Processes: Update procedures based on findings. Reconcile Inventory: Correct system inaccuracies. Monitor Progress: Track the impact of changes. Automate and Review: Automate Scheduling: Use inventory software for recurring reminders. Regular Reviews: Periodically assess the audit process and adjust the schedule. B. Tips for Maximizing Accuracy and Efficiency in Regular Inventory Audits \u200b Prepare Thoroughly: Update Records Beforehand: Ensure up-to-date inventory records. Organize Inventory: Arrange items systematically (e.g., by category or SKU). Label Clearly: Use visible and consistent labeling. Use Technology: Barcode/RFID Systems: Reduce errors and speed up counting. Inventory Software Integration: Sync physical counts with digital systems. Mobile Devices: Use handheld scanners or tablets for data input. Train Your Team: Provide Detailed Instructions: Train staff on procedures and tools/software. Emphasize Accuracy: Stress precision over speed. Assign Roles Clearly: Designate specific responsibilities. Choose the Right Timing: Schedule During Downtime: Conduct audits during non-peak hours. Avoid Inventory Movements: Freeze inventory activities during the audit. Break Down the Process: Divide Inventory into Sections: Count smaller sections. Cycle Counting: Audit high-value/fast-moving items more frequently. Rotational Teams: Use multiple teams for large inventories. Use Checklists: Pre-Audit Checklist: Ensure all tools, documents, and resources are ready. During Audit Checklist: Track what has been counted. Double-Check Critical Areas: Spot Check: Recount high-value/frequently miscounted items. Reconciliation: Compare physical counts with system records. Maintain Clear Communication: Pre-Audit Meetings: Brief the team on objectives, timelines, and roles. Real-Time Update",
+    "elements": [
+      "Technology-Assisted: Use barcode scanners, RFID, or inventory software",
+      "Use Technology: Barcode/RFID Systems: Reduce errors and speed up counting",
+      "Mobile Devices: Use handheld scanners or tablets for data input",
+      "Solution: Adopted Auditeeze with barcode scanning and integration with existing systems"
+    ],
+    "actions": [
+      "Best Practices for Inventory Audits | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Best Practices for Inventory Audits On this page Best Practices for Inventory Audits A",
+      "Prepare a Calendar: Create a Schedule: Use tools like Excel, Google Calendar, or inventory management software",
+      "Assign Responsibilities: Designate Auditors: Choose employees or hire external auditors",
+      "Technology-Assisted: Use barcode scanners, RFID, or inventory software",
+      "Tools: Ensure scanners and handheld devices are operational",
+      "Mobile Devices: Use handheld scanners or tablets for data input",
+      "Assign Roles Clearly: Designate specific responsibilities",
+      "Foster Accountability: Monitor Performance: Assess the audit team\u2019s performance",
+      "Solution: Adopted Auditeeze with barcode scanning and integration with existing systems"
+    ],
+    "validations": [],
+    "apis": [],
+    "expected_results": [],
+    "doc_status": "DOCUMENTED"
+  },
+  {
+    "url": "https://docs.stockount.com/docs/category/audit",
+    "title": "Audit",
+    "category": "audit",
+    "content_raw": "Audit | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Dashboard Audit Plans Create Audit Plan Different Audit Types and Frequencies Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Audit Audit The Audits Module is organised into three sub-modules. \ud83d\udcc4\ufe0f Dashboard Dashboard \ud83d\udcc4\ufe0f Audit Plans Audit Plans Landing Page \ud83d\udcc4\ufe0f Create Audit Plan Audit Plan Creation and Update Process \ud83d\udcc4\ufe0f Different Audit Types and Frequencies Audit Plan Functionalities by Audit Type and Frequency Previous Role Access Next Dashboard Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved.",
+    "elements": [],
+    "actions": [
+      "Audit | Stockount Skip to main content Stockount User Guide Introduction to Stockount Getting Started Setup and Configuration Audit Dashboard Audit Plans Create Audit Plan Different Audit Types and Frequencies Performing Audit Mobile Application User Guide Best Practices for Inventory Audits Appendix Audit Audit The Audits Module is organised into three sub-modules",
+      "\ud83d\udcc4\ufe0f Dashboard Dashboard \ud83d\udcc4\ufe0f Audit Plans Audit Plans Landing Page \ud83d\udcc4\ufe0f Create Audit Plan Audit Plan Creation and Update Process \ud83d\udcc4\ufe0f Different Audit Types and Frequencies Audit Plan Functionalities by Audit Type and Frequency Previous Role Access Next Dashboard Docs User Guide Community Youtube Facebook X Linkedin Copyright \u00a9 2025 WillWorks Infinity Pvt Ltd - All rights reserved"
+    ],
+    "validations": [],
+    "apis": [],
+    "expected_results": [],
+    "doc_status": "DOCUMENTED"
+  }
+]

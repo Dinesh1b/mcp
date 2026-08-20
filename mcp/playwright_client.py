@@ -46,6 +46,8 @@ class PlaywrightClient:
         self._browser: Optional[Browser] = None
         self._context: Optional[BrowserContext] = None
         self._page: Optional[Page] = None
+        self._network_logs: list[dict[str, Any]] = []
+        self._console_logs: list[dict[str, Any]] = []
 
     # ── Lifecycle ─────────────────────────────────────────────────────────────
 
@@ -58,8 +60,20 @@ class PlaywrightClient:
 
     async def start(self) -> None:
         self._pw = await async_playwright().start()
-        launcher = getattr(self._pw, self._browser_type)
-        self._browser = await launcher.launch(headless=self._headless)
+        launcher = getattr(self._pw, self._browser_type, self._pw.chromium)
+        try:
+            self._browser = await launcher.launch(headless=self._headless)
+        except Exception:
+            # Fallback to system-installed Microsoft Edge or Google Chrome
+            try:
+                self._browser = await self._pw.chromium.launch(channel="msedge", headless=self._headless)
+            except Exception:
+                try:
+                    self._browser = await self._pw.chromium.launch(channel="chrome", headless=self._headless)
+                except Exception as e:
+                    raise RuntimeError(
+                        f"Could not launch browser. Please run 'playwright install' or install Chrome/Edge: {e}"
+                    )
         context_kwargs: dict[str, Any] = {
             "viewport": {"width": 1280, "height": 800},
         }
@@ -68,6 +82,87 @@ class PlaywrightClient:
         self._context = await self._browser.new_context(**context_kwargs)
         self._context.set_default_timeout(settings.timeout)
         self._page = await self._context.new_page()
+
+        # Attach network & console listeners
+        self._page.on("request", self._handle_request)
+        self._page.on("response", self._handle_response)
+        self._page.on("console", self._handle_console)
+
+    def _handle_request(self, request: Any) -> None:
+        url = request.url
+        if not any(url.endswith(ext) for ext in [".png", ".jpg", ".svg", ".css", ".woff", ".woff2", ".ico"]):
+            self._network_logs.append({
+                "type": "request",
+                "method": request.method,
+                "url": url,
+                "headers": dict(list(request.headers.items())[:5]),
+            })
+
+    def _handle_response(self, response: Any) -> None:
+        url = response.url
+        if not any(url.endswith(ext) for ext in [".png", ".jpg", ".svg", ".css", ".woff", ".woff2", ".ico"]):
+            self._network_logs.append({
+                "type": "response",
+                "status": response.status,
+                "url": url,
+                "ok": response.ok,
+            })
+
+    def _handle_console(self, msg: Any) -> None:
+        self._console_logs.append({
+            "type": msg.type,
+            "text": msg.text,
+            "location": msg.location,
+        })
+
+    def get_network_logs(self) -> list[dict[str, Any]]:
+        return list(self._network_logs)
+
+    def get_console_logs(self) -> list[dict[str, Any]]:
+        return list(self._console_logs)
+
+    def clear_logs(self) -> None:
+        self._network_logs.clear()
+        self._console_logs.clear()
+
+    async def extract_interactive_elements(self) -> list[dict[str, Any]]:
+        """Extract interactive elements (buttons, inputs, links, selects) on the current page."""
+        js_code = """() => {
+            const elements = [];
+            const queryAll = document.querySelectorAll('button, input, select, textarea, a, [role="button"]');
+            queryAll.forEach((el, index) => {
+                if (el.offsetParent !== null) { // visible
+                    const tag = el.tagName.toLowerCase();
+                    const type = el.getAttribute('type') || '';
+                    const text = (el.innerText || el.value || el.placeholder || el.getAttribute('aria-label') || '').trim();
+                    const id = el.id || '';
+                    const name = el.getAttribute('name') || '';
+                    const role = el.getAttribute('role') || '';
+                    
+                    let selector = '';
+                    if (id) selector = `#${id}`;
+                    else if (name) selector = `[name="${name}"]`;
+                    else if (text && text.length < 30) selector = `text="${text}"`;
+                    else selector = `${tag}:nth-of-type(${index + 1})`;
+
+                    elements.push({
+                        tag,
+                        type,
+                        text,
+                        id,
+                        name,
+                        role,
+                        selector,
+                        placeholder: el.placeholder || '',
+                    });
+                }
+            });
+            return elements.slice(0, 50);
+        }"""
+        try:
+            return await self.page.evaluate(js_code)
+        except Exception:
+            return []
 
     async def stop(self) -> None:
         if self._context:

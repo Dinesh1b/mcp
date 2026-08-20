@@ -1,0 +1,20 @@
+{
+  "module_name": "inventory",
+  "doc_status": "DOCUMENTED",
+  "last_updated": "2026-08-20T23:02:09.626233",
+  "pages": [],
+  "selectors": {},
+  "apis": [
+    {
+      "method": "POST",
+      "url": "/api/v1/items",
+      "status": 201,
+      "triggering_action": "Add Item",
+      "timestamp": "2026-08-20T23:02:09.626225"
+    }
+  ],
+  "known_flows": [],
+  "prior_results": [],
+  "known_failures": [],
+  "discrepancies": []
+}

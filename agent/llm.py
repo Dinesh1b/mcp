@@ -34,12 +34,77 @@ async def call_llm(system: str, user: str, max_tokens: int = 4096) -> str:
     """
     provider = settings.llm_provider.lower()
 
-    if provider == "openai":
+    if provider == "gemini" or provider == "google":
+        return await _call_gemini(system=system, user=user, max_tokens=max_tokens)
+    elif provider == "openai":
         return await _call_openai(system=system, user=user, max_tokens=max_tokens)
     elif provider == "anthropic":
         return await _call_anthropic(system=system, user=user, max_tokens=max_tokens)
     else:
-        raise ValueError(f"Unsupported LLM_PROVIDER: '{provider}'. Use 'openai' or 'anthropic'.")
+        raise ValueError(f"Unsupported LLM_PROVIDER: '{provider}'. Use 'gemini', 'openai', or 'anthropic'.")
+
+
+async def _call_gemini(system: str, user: str, max_tokens: int) -> str:
+    """Call Google Gemini API."""
+    if not settings.gemini_api_key:
+        raise EnvironmentError("GEMINI_API_KEY / GOOGLE_API_KEY is not set.")
+
+    # Try modern google-genai or google-generativeai SDK
+    try:
+        from google import genai
+        client = genai.Client(api_key=settings.gemini_api_key)
+        response = client.models.generate_content(
+            model=settings.llm_model or "gemini-2.5-flash",
+            contents=f"System instructions:\n{system}\n\nUser request:\n{user}",
+        )
+        return response.text or ""
+    except ImportError:
+        pass
+
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=settings.gemini_api_key)
+        model = genai.GenerativeModel(
+            model_name=settings.llm_model or "gemini-2.5-flash",
+            system_instruction=system,
+        )
+        response = await model.generate_content_async(user)
+        return response.text or ""
+    except ImportError:
+        pass
+
+    # Fallback to direct HTTP request using urllib
+    import urllib.request
+    import json
+
+    model_name = settings.llm_model or "gemini-2.5-flash"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={settings.gemini_api_key}"
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": f"System instructions:\n{system}\n\nUser request:\n{user}"}
+                ]
+            }
+        ],
+        "generationConfig": {
+            "maxOutputTokens": max_tokens,
+            "temperature": 0.1,
+        }
+    }
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        data = json.loads(resp.read().decode("utf-8"))
+        candidates = data.get("candidates", [])
+        if candidates and "content" in candidates[0]:
+            parts = candidates[0]["content"].get("parts", [])
+            return "".join(p.get("text", "") for p in parts)
+        return ""
 
 
 def _get_openai_client():
