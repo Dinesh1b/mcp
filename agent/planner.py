@@ -24,30 +24,30 @@ from agent.repro_engine import ReproductionEngine
 PLANNER_PROMPT = """\
 You are a QA test planner for Stockount web applications.
 
-Core Principle: "Docs are reference; the live app is what we actually test."
+Core Principle: "The Live Website is the primary source of truth. Docs are reference only."
 
 ## Testing Requirement / Input
 {requirement}
 
-## Documentation Reference Context
+## Documentation Reference Context (Use only for clarification)
 {doc_reference}
 
-## Known Persistent Module Memory (Prior Selectors & APIs)
+## Known Persistent Module Memory (Prior Selectors, APIs & Flows)
 {memory_summary}
 
-## Application Exploration Data (Live State)
+## Application Exploration Data (Live State - PRIMARY SOURCE)
 {exploration_data}
 
 ## Instructions
 - Identify the module and its documentation status (DOCUMENTED or UNDOCUMENTED).
-- If DOCUMENTED:
-  - Create test scenarios grounded in the reference docs and live UI state.
-  - Specify clear expected results to validate against the live app.
-- If UNDOCUMENTED (e.g. Sales, Purchases, Reports):
+- Create test scenarios strictly grounded in the **Application Exploration Data (Live State)** and **Persistent Module Memory**.
+- Use the **Documentation Reference Context** ONLY to understand terminology, business flows, or clarify unclear functionality. Do NOT blindly reproduce exact flows described in the documentation if they differ from the live state.
+- If the module is UNDOCUMENTED (e.g., Sales, Purchases, Reports) or if the feature is not found in the docs:
+  - You MUST STILL generate comprehensive test cases based on the discovered live state.
   - Mark testing_types as ["exploratory"] and doc_status as "UNDOCUMENTED".
-  - Do NOT fabricate assumed ERP workflows (no assumed PO/PI/GRN or SO/SI/DN).
-  - Set expected_result to "Observe and document live application behavior and API responses."
-- Ground steps in known selectors and interactive elements from exploration data and memory.
+  - Do NOT fabricate assumed ERP workflows (e.g., no assumed PO/PI/GRN if not present in the live data).
+  - Ground steps entirely in known selectors, interactive elements, and forms from the live exploration data.
+- Ensure all test steps use selectors that actually exist in the live UI.
 
 Respond ONLY with a valid JSON object matching this schema:
 {{

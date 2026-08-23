@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import asyncio
 from typing import Any, Optional
+from urllib.parse import urlparse, urljoin
 
 from config.settings import settings
 from mcp.playwright_client import PlaywrightClient
@@ -26,6 +27,7 @@ from workflows.login import perform_login
 async def explore_application(
     base_url: str | None = None,
     target_module: str | None = None,
+    max_pages_per_module: int = 10,
 ) -> dict[str, Any]:
     """
     Explore the live application, reconcile against doc coverage,
@@ -49,8 +51,7 @@ async def explore_application(
         await client.navigate(url)
         try:
             await perform_login(client)
-        except Exception as e:
-            # Login failed or already logged in
+        except Exception:
             pass
 
         # Capture Dashboard / landing state
@@ -82,49 +83,83 @@ async def explore_application(
                 client.clear_logs()
                 await client.click(mod["selector"])
                 await client.wait_for_network_idle()
+                
+                # Start Bounded Module Crawl
+                module_base_url = await client.get_url()
+                visited_urls = set()
+                to_visit = [module_base_url]
+                
+                hierarchy = {"name": mod_name, "children": []}
 
-                # Take exploration screenshot
-                screenshot_name = f"explore_{memory.module_key}"
-                screenshot_path = await client.screenshot(screenshot_name)
+                while to_visit and len(visited_urls) < max_pages_per_module:
+                    current_url = to_visit.pop(0)
+                    if current_url in visited_urls:
+                        continue
+                        
+                    await client.navigate(current_url)
+                    await client.wait_for_network_idle()
+                    
+                    visited_urls.add(current_url)
 
-                # Capture page details & interactive elements
-                page_data = await _capture_page_state(
-                    client,
-                    label=mod_name,
-                    module_name=mod_name,
-                    retriever=retriever,
-                    screenshot_path=str(screenshot_path),
-                )
-                mod_entry["pages"].append(page_data)
-                exploration["pages"].append(page_data)
+                    # Take exploration screenshot
+                    screenshot_name = f"explore_{memory.module_key}_{len(visited_urls)}"
+                    screenshot_path = await client.screenshot(screenshot_name)
 
-                # Update module persistent memory
-                memory.add_or_update_page(page_data)
+                    # Capture page details & interactive elements
+                    page_data = await _capture_page_state(
+                        client,
+                        label=f"{mod_name} - Page {len(visited_urls)}",
+                        module_name=mod_name,
+                        retriever=retriever,
+                        screenshot_path=str(screenshot_path),
+                    )
+                    mod_entry["pages"].append(page_data)
+                    exploration["pages"].append(page_data)
 
-                # Record API calls observed
-                for net in client.get_network_logs():
-                    if net.get("type") == "response":
-                        memory.record_api_call(
-                            method="GET",  # Default or extracted
-                            url=net.get("url", ""),
-                            status=net.get("status", 200),
-                            action=f"Navigate to {mod_name}",
-                        )
+                    # Update module persistent memory
+                    memory.add_or_update_page(page_data)
+                    
+                    # Extract intra-module links for further crawling
+                    links = await client.page.query_selector_all("a[href]")
+                    for link in links:
+                        href = await link.get_attribute("href")
+                        if href:
+                            full_url = urljoin(current_url, href)
+                            # Only crawl within the same module's path to prevent wandering
+                            if _is_within_module(module_base_url, full_url) and full_url not in visited_urls and full_url not in to_visit:
+                                to_visit.append(full_url)
+                                hierarchy["children"].append({"url": full_url, "discovered_from": current_url})
+
+                    # Record API calls observed
+                    for net in client.get_network_logs():
+                        if net.get("type") == "response":
+                            memory.record_api_call(
+                                method="GET",
+                                url=net.get("url", ""),
+                                status=net.get("status", 200),
+                                action=f"Navigate to {current_url}",
+                            )
+                            
+                # Update module map hierarchy
+                memory.module_map["hierarchy"] = hierarchy
+                memory.save()
 
                 # Check for discrepancies against reference docs
                 if doc_status == "DOCUMENTED":
                     doc_chunks = retriever.retrieve_relevant_chunks(mod_name, module_name=mod_name, max_chunks=1)
                     if doc_chunks:
                         expected_elements = doc_chunks[0].get("elements", [])
-                        observed_elements = [el.get("text", "") for el in page_data.get("interactive_elements", [])]
+                        observed_elements = []
+                        for p in mod_entry["pages"]:
+                            observed_elements.extend([el.get("text", "") for el in p.get("interactive_elements", [])])
+                            
                         for exp in expected_elements[:3]:
                             if not any(exp.lower() in obs.lower() for obs in observed_elements if obs):
                                 disc_title = f"Potential missing element in {mod_name}: '{exp}'"
                                 memory.record_discrepancy(
                                     title=disc_title,
                                     documented_expectation=f"Docs mention element: {exp}",
-                                    actual_behavior=f"Element not immediately visible on {page_data['url']}",
-                                    evidence={"url": page_data["url"], "screenshot": str(screenshot_path)},
+                                    actual_behavior=f"Element not found in discovered pages",
                                 )
                                 exploration["discrepancies"].append({
                                     "module": mod_name,
@@ -138,6 +173,20 @@ async def explore_application(
 
     return exploration
 
+def _is_within_module(base_url: str, target_url: str) -> bool:
+    """Check if target_url belongs to the same logical path as base_url."""
+    base_parsed = urlparse(base_url)
+    target_parsed = urlparse(target_url)
+    
+    if base_parsed.netloc != target_parsed.netloc:
+        return False
+        
+    # Example heuristic: if base is /sales, target must start with /sales
+    base_path = base_parsed.path.rstrip('/')
+    if not base_path:
+        return True # if base is root, everything is in module
+        
+    return target_parsed.path.startswith(base_path)
 
 async def _capture_page_state(
     client: PlaywrightClient,
@@ -163,9 +212,8 @@ async def _capture_page_state(
         "dom_snippet": (await client.get_dom_snapshot())[:2500],
     }
 
-
 async def _discover_nav_modules(client: PlaywrightClient) -> list[dict[str, Any]]:
-    """Discover top-level navigation items (Inventory, Sales, Purchases, Audits, Reports, etc.)."""
+    """Discover top-level navigation items."""
     nav_links: list[dict[str, Any]] = []
     try:
         elements = await client.page.query_selector_all("nav a, [role='navigation'] a, aside a, .sidebar a")
@@ -177,7 +225,6 @@ async def _discover_nav_modules(client: PlaywrightClient) -> list[dict[str, Any]
     except Exception:
         pass
 
-    # Fallback to standard canonical modules if nav elements are not found
     if not nav_links:
         for mod in ["Inventory", "Audit", "Performing Audit", "Sales", "Purchases", "Reports", "Setup"]:
             nav_links.append({"label": mod, "href": f"/{mod.lower().replace(' ', '-')}", "selector": f"text={mod}"})
