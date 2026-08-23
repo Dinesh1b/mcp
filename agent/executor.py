@@ -37,8 +37,21 @@ async def execute_test_plan(
         await client.navigate(url)
         try:
             await perform_login(client)
-        except Exception:
-            pass
+        except Exception as exc:
+            # Bug 4 fix: Do not swallow login failures. Mark run as blocked.
+            results.append({
+                "id": "AUTH_FAILURE",
+                "title": "Application Authentication",
+                "type": "system",
+                "doc_status": "UNDOCUMENTED",
+                "status": "BLOCKED",
+                "actual_result": f"Login failed: {exc}",
+                "defects": [],
+                "evidence": [],
+                "failure_analysis": {"failure_type": "authentication_issue", "reason": str(exc)},
+            })
+            memory.record_run_result({"feature": "authentication", "results_count": 1, "status": "BLOCKED"})
+            return results
 
         # If it's a known macro business flow requirement
         feature_name = test_plan.get("feature", "").lower()

@@ -61,6 +61,29 @@ class Settings:
     knowledge_dir: Path = project_root / "knowledge"
     modules_dir: Path = project_root / "modules"
 
+    def reload(self) -> None:
+        """Reload settings from environment variables."""
+        self.base_url = os.getenv("BASE_URL", "http://localhost:3000")
+        self.docs_url = os.getenv("DOCS_URL", "https://docs.stockount.com")
+        self.qa_username = os.getenv("QA_USERNAME", "")
+        self.qa_password = os.getenv("QA_PASSWORD", "")
+        self.browser = os.getenv("BROWSER", "chromium")
+        self.headless = os.getenv("HEADLESS", "true").lower() == "true"
+        self.timeout = int(os.getenv("TIMEOUT", "30000"))
+        
+        self.screenshot_on_failure = os.getenv("SCREENSHOT_ON_FAILURE", "true").lower() == "true"
+        self.video_on_failure = os.getenv("VIDEO_ON_FAILURE", "true").lower() == "true"
+        self.trace_on_retry = os.getenv("TRACE_ON_RETRY", "true").lower() == "true"
+        
+        self.llm_provider = os.getenv("LLM_PROVIDER", "gemini")
+        self.llm_model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
+        self.openai_api_key = os.getenv("OPENAI_API_KEY", "")
+        self.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+        
+        self.report_dir = self.project_root / os.getenv("REPORT_DIR", "reports")
+        self.evidence_dir = self.project_root / os.getenv("EVIDENCE_DIR", "evidence")
+
     @classmethod
     def ensure_dirs(cls) -> None:
         """Create required output directories if they do not exist."""

@@ -211,10 +211,14 @@ def main():
 
     if hasattr(args, "url") and args.url:
         os.environ["BASE_URL"] = args.url
-    if hasattr(args, "headless") and args.headless:
-        os.environ["HEADLESS"] = "true"
+    if hasattr(args, "headless") and args.headless is not None:
+        if args.headless:
+            os.environ["HEADLESS"] = "true"
     if hasattr(args, "headed") and args.headed:
         os.environ["HEADLESS"] = "false"
+
+    # Reload settings after env overrides
+    settings.reload()
 
     if args.command == "test":
         asyncio.run(run_test_workflow(args.requirement))
