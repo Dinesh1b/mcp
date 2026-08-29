@@ -28,6 +28,7 @@ class Settings:
 
     # ── Application Under Test ────────────────────────────────────────────────
     base_url: str = os.getenv("BASE_URL", "http://localhost:3000")
+    docs_url: str = os.getenv("DOCS_URL", "https://docs.stockount.com")
 
     # ── Authentication ────────────────────────────────────────────────────────
     qa_username: str = os.getenv("QA_USERNAME", "")
@@ -46,8 +47,9 @@ class Settings:
     trace_on_retry: bool = os.getenv("TRACE_ON_RETRY", "true").lower() == "true"
 
     # ── LLM ──────────────────────────────────────────────────────────────────
-    llm_provider: str = os.getenv("LLM_PROVIDER", "openai")
-    llm_model: str = os.getenv("LLM_MODEL", "gpt-4o")
+    llm_provider: str = os.getenv("LLM_PROVIDER", "gemini")
+    llm_model: str = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
     anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
 
@@ -56,6 +58,31 @@ class Settings:
     report_dir: Path = project_root / os.getenv("REPORT_DIR", "reports")
     evidence_dir: Path = project_root / os.getenv("EVIDENCE_DIR", "evidence")
     test_data_dir: Path = project_root / "test-data"
+    knowledge_dir: Path = project_root / "knowledge"
+    modules_dir: Path = project_root / "modules"
+
+    def reload(self) -> None:
+        """Reload settings from environment variables."""
+        self.base_url = os.getenv("BASE_URL", "http://localhost:3000")
+        self.docs_url = os.getenv("DOCS_URL", "https://docs.stockount.com")
+        self.qa_username = os.getenv("QA_USERNAME", "")
+        self.qa_password = os.getenv("QA_PASSWORD", "")
+        self.browser = os.getenv("BROWSER", "chromium")
+        self.headless = os.getenv("HEADLESS", "true").lower() == "true"
+        self.timeout = int(os.getenv("TIMEOUT", "30000"))
+        
+        self.screenshot_on_failure = os.getenv("SCREENSHOT_ON_FAILURE", "true").lower() == "true"
+        self.video_on_failure = os.getenv("VIDEO_ON_FAILURE", "true").lower() == "true"
+        self.trace_on_retry = os.getenv("TRACE_ON_RETRY", "true").lower() == "true"
+        
+        self.llm_provider = os.getenv("LLM_PROVIDER", "gemini")
+        self.llm_model = os.getenv("LLM_MODEL", "gemini-2.5-flash")
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY", os.getenv("GOOGLE_API_KEY", ""))
+        self.openai_api_key = os.getenv("OPENAI_API_KEY", "")
+        self.anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+        
+        self.report_dir = self.project_root / os.getenv("REPORT_DIR", "reports")
+        self.evidence_dir = self.project_root / os.getenv("EVIDENCE_DIR", "evidence")
 
     @classmethod
     def ensure_dirs(cls) -> None:
@@ -64,6 +91,19 @@ class Settings:
             (cls.evidence_dir / subdir).mkdir(parents=True, exist_ok=True)
         cls.report_dir.mkdir(parents=True, exist_ok=True)
         cls.test_data_dir.mkdir(parents=True, exist_ok=True)
+        cls.knowledge_dir.mkdir(parents=True, exist_ok=True)
+        cls.modules_dir.mkdir(parents=True, exist_ok=True)
+        # Ensure subdirectories for module stores
+        for mod in [
+            "setup-and-configuration",
+            "audit",
+            "performing-audit",
+            "inventory",
+            "sales",
+            "purchases",
+            "reports",
+        ]:
+            (cls.modules_dir / mod).mkdir(parents=True, exist_ok=True)
 
 
 settings = Settings()

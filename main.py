@@ -1,11 +1,7 @@
 """
-main.py — Reusable MCP-Based Autonomous QA Platform CLI.
+main.py — AI QA Agent CLI entry point.
 
 Usage examples:
-    python main.py pipeline audit
-    python main.py pipeline inventory
-    python main.py pipeline finance
-    python main.py modules
     python main.py test "Test the Inventory module."
     python main.py explore
     python main.py report
@@ -13,79 +9,23 @@ Usage examples:
 
 from __future__ import annotations
 
+import argparse
 import asyncio
+import os
 import sys
 from pathlib import Path
-
-if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
-    try:
-        sys.stdout.reconfigure(encoding="utf-8")
-        sys.stderr.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
 
 import typer
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn
-
-# Ensure mcp modules auto-register on startup
-import mcp.modules  # noqa: F401
-from mcp.core.module_registry import module_registry
-from mcp.core.orchestrator import Orchestrator
 
 app = typer.Typer(
     name="ai-qa-agent",
-    help="Autonomous MCP-Based QA Platform — powered by Playwright, LLM reasoning, and persistent Module Memory.",
+    help="AI QA Agent — automated web application testing powered by LLM + Playwright.",
     add_completion=False,
 )
 console = Console()
-
-
-@app.command()
-def pipeline(
-    module: str = typer.Argument(
-        ..., help='Business module to test: "audit", "inventory", "finance"'
-    ),
-    url: str = typer.Option(None, "--url", "-u", help="Override base URL from .env"),
-    requirement: str = typer.Option(None, "--req", "-r", help="Custom requirement string"),
-    headless: bool = typer.Option(None, "--headless/--headed", help="Run browser headless or headed"),
-) -> None:
-    """Run the 12-step autonomous MCP QA pipeline for a specific business module."""
-    if url:
-        import os
-        os.environ["BASE_URL"] = url
-    if headless is not None:
-        import os
-        os.environ["HEADLESS"] = "true" if headless else "false"
-
-    mod_name = module.lower()
-    if not module_registry.has(mod_name):
-        available = ", ".join(module_registry.list_modules())
-        console.print(f"[red]Error: Module '{module}' is not registered.[/red]")
-        console.print(f"[yellow]Available modules: {available}[/yellow]")
-        raise typer.Exit(1)
-
-    orch = Orchestrator(module_name=mod_name, base_url=url, requirement=requirement)
-    asyncio.run(orch.run())
-
-
-@app.command()
-def modules() -> None:
-    """List all registered business modules in the MCP QA Platform."""
-    table = Table(title="Registered Business Modules")
-    table.add_column("Module Key", style="cyan", no_wrap=True)
-    table.add_column("Display Name", style="bold")
-    table.add_column("Default Route", style="dim")
-    table.add_column("Workflows", justify="right")
-
-    for key in module_registry.list_modules():
-        mod = module_registry.get(key)
-        wfs = len(mod.get_workflows())
-        table.add_row(mod.name, mod.display_name, mod.default_route, str(wfs))
-
-    console.print(table)
 
 
 @app.command()
@@ -96,7 +36,7 @@ def test(
     url: str = typer.Option(None, "--url", "-u", help="Override base URL from .env"),
     headless: bool = typer.Option(None, "--headless/--headed", help="Run browser headless or headed"),
 ) -> None:
-    """Run the standard QA agent workflow: Explore → Plan → Execute → Report."""
+    """Run the full QA agent workflow: Explore → Plan → Execute → Report."""
     console.print(
         Panel.fit(
             f"[bold cyan]AI QA Agent[/bold cyan]\n[dim]{requirement}[/dim]",
@@ -138,13 +78,13 @@ def report() -> None:
         console.print(f"  📄 {r}")
 
 
-async def _run_full_workflow(requirement: str) -> None:
-    from config.settings import settings
+async def run_test_workflow(requirement: str) -> None:
     from agent.explorer import explore_application
     from agent.planner import generate_test_plan
     from agent.executor import execute_test_plan
     from agent.defect_classifier import classify_defect
     from agent.reporter import generate_report
+    from agent.repro_engine import ReproductionEngine
 
     settings.ensure_dirs()
 
@@ -191,7 +131,7 @@ async def _run_full_workflow(requirement: str) -> None:
         # Phase 4: Classify defects
         task = progress.add_task("🔬 Phase 4 — Classifying defects…", total=None)
         for result in results:
-            if result.get("status") == "FAIL" and result.get("failure_analysis"):
+            if result["status"] == "FAIL" and result.get("failure_analysis"):
                 fa = result["failure_analysis"]
                 if fa.get("failure_type") == "application_defect":
                     try:
@@ -204,22 +144,20 @@ async def _run_full_workflow(requirement: str) -> None:
                         pass
         progress.remove_task(task)
 
-        # Phase 5: Report
-        task = progress.add_task("📊 Phase 5 — Generating QA report…", total=None)
-        try:
-            report_path = generate_report(requirement, test_plan, results)
-            progress.update(task, description="✅ Phase 5 — Report generated")
-        except Exception as exc:
-            console.print(f"[red]Report generation failed: {exc}[/red]")
-            raise typer.Exit(1)
-        finally:
-            progress.remove_task(task)
+    # Step 5: Report
+    print("\n📊 [5/5] Generating QA Markdown and JSON reports...")
+    try:
+        report_path = generate_report(requirement, test_plan, results)
+        print(f"✅ QA Report successfully saved:\n   {report_path}")
+    except Exception as exc:
+        print(f"❌ Report generation failed: {exc}")
+        return
 
     # Summary
-    passed = sum(1 for r in results if r.get("status") == "PASS")
-    failed = sum(1 for r in results if r.get("status") == "FAIL")
-    blocked = sum(1 for r in results if r.get("status") == "BLOCKED")
-    skipped = sum(1 for r in results if r.get("status") == "SKIPPED")
+    passed = sum(1 for r in results if r["status"] == "PASS")
+    failed = sum(1 for r in results if r["status"] == "FAIL")
+    blocked = sum(1 for r in results if r["status"] == "BLOCKED")
+    skipped = sum(1 for r in results if r["status"] == "SKIPPED")
 
     console.print()
     console.print(
@@ -242,14 +180,74 @@ async def _run_explore() -> None:
     import json
 
     settings.ensure_dirs()
-    console.print("[cyan]Exploring application…[/cyan]")
-    try:
-        data = await explore_application()
-        console.print(json.dumps(data, indent=2, default=str))
-    except Exception as exc:
-        console.print(f"[red]Exploration failed: {exc}[/red]")
-        raise typer.Exit(1)
+    reports = list(settings.report_dir.glob("*.md"))
+    if not reports:
+        print("\n[!] No reports found in reports/ directory.\n")
+        return
+    print(f"\nFound {len(reports)} QA Report(s):")
+    for r in sorted(reports, reverse=True):
+        print(f"  📄 {r}")
+    print()
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Stockount AI QA Platform (Antigravity + Gemini + MCP + Playwright)",
+        epilog="Principle: 'Docs are reference; the live app is what we actually test.'",
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
+    # Command: test
+    test_parser = subparsers.add_parser("test", help="Run full QA workflow on a requirement")
+    test_parser.add_argument("requirement", type=str, help="Testing requirement string")
+    test_parser.add_argument("--url", "-u", type=str, default=None, help="Base URL override")
+    test_parser.add_argument("--headless", action="store_true", default=None, help="Run headless")
+    test_parser.add_argument("--headed", action="store_true", default=None, help="Run headed")
+
+    # Command: crawl-docs
+    subparsers.add_parser("crawl-docs", help="Crawl and structure docs.stockount.com")
+
+    # Command: explore
+    explore_parser = subparsers.add_parser("explore", help="Explore live application and map elements")
+    explore_parser.add_argument("--module", "-m", type=str, default=None, help="Target module name")
+    explore_parser.add_argument("--url", "-u", type=str, default=None, help="Base URL override")
+
+    # Command: reproduce
+    repro_parser = subparsers.add_parser("reproduce", help="Reproduce bug or execute step sequence")
+    repro_parser.add_argument("target", type=str, help="Sequence, bug repro text, or test case file path")
+    repro_parser.add_argument("--url", "-u", type=str, default=None, help="Base URL override")
+
+    # Command: report
+    subparsers.add_parser("report", help="List generated QA reports")
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return
+
+    if hasattr(args, "url") and args.url:
+        os.environ["BASE_URL"] = args.url
+    if hasattr(args, "headless") and args.headless is not None:
+        if args.headless:
+            os.environ["HEADLESS"] = "true"
+    if hasattr(args, "headed") and args.headed:
+        os.environ["HEADLESS"] = "false"
+
+    # Reload settings after env overrides
+    settings.reload()
+
+    if args.command == "test":
+        asyncio.run(run_test_workflow(args.requirement))
+    elif args.command == "crawl-docs":
+        asyncio.run(run_crawl_docs())
+    elif args.command == "explore":
+        asyncio.run(run_explore(args.module))
+    elif args.command == "reproduce":
+        asyncio.run(run_reproduce(args.target))
+    elif args.command == "report":
+        list_reports()
 
 
 if __name__ == "__main__":
-    app()
+    main()

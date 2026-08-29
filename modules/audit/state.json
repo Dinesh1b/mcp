@@ -1,0 +1,28 @@
+{
+  "module_name": "audit",
+  "doc_status": "DOCUMENTED",
+  "last_updated": "2026-08-20T23:06:21.997228",
+  "pages": [],
+  "selectors": {},
+  "apis": [],
+  "known_flows": [],
+  "prior_results": [
+    {
+      "timestamp": "2026-08-20T23:06:21.997217",
+      "summary": {
+        "feature": "Step Sequence Execution",
+        "results_count": 3
+      }
+    }
+  ],
+  "known_failures": [],
+  "discrepancies": [
+    {
+      "title": "Test Discrepancy",
+      "documented_expectation": "Audit history should have no edit button",
+      "actual_behavior": "Edit button is visible",
+      "evidence": {},
+      "recorded_at": "2026-08-20T23:02:09.604922"
+    }
+  ]
+}

@@ -1,49 +1,60 @@
 """
-agent/verifier.py — Application state verification engine.
+agent/verifier.py — Multi-Level Application State & Discrepancy Verification Engine.
 
-A successful UI action does NOT mean the test passed.
-This module verifies the resulting state after each scenario.
+Implements Phase 5:
+- Documented areas: Validate actual (live-app) behavior against documented expectations.
+  If the app's actual behavior diverges from documentation, record it as a discrepancy finding.
+- Undocumented areas: Explore the live application, capture UI/API behavior, and report findings
+  as OBSERVED / UNVERIFIABLE; never fabricate expected results.
 """
 
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Optional
 
 from agent.llm import call_llm
 from mcp.playwright_client import PlaywrightClient
 from prompts import SYSTEM_PROMPT
 from utils.helpers import parse_llm_json
+from knowledge.rag_retriever import RAGRetriever
+from agent.memory_store import ModuleMemoryStore
 
 
 VERIFIER_PROMPT = """\
-You are a QA verification engine.
+You are a QA verification engine for Stockount.
 
-A test scenario was executed. Evaluate whether the application's actual
-state matches the expected result.
+Core Principle: "Docs are reference; the live app is what we actually test."
 
 ## Scenario
 {scenario}
 
-## Expected Result
-{expected_result}
+## Reference Documentation (Expectations)
+{doc_reference}
 
-## Current Application State
+## Current Live Application State
 URL: {url}
 Title: {title}
+Observed Network Calls: {network_summary}
+Console Errors: {console_summary}
 DOM Snippet:
 {dom_snippet}
 
 ## Instructions
-- Compare the actual application state against the expected result.
-- Do NOT assume the action succeeded just because the UI accepted it.
-- Check: record created, correct values displayed, notifications shown, state persisted.
-- Respond ONLY with a valid JSON object:
+- For DOCUMENTED modules: Compare the live app state against documented expectations.
+  - If actual matches doc expectation -> status: "PASS".
+  - If actual differs from doc expectation -> status: "DISCREPANCY" (describe mismatch precisely).
+  - If actual application error occurred -> status: "FAIL".
+- For UNDOCUMENTED modules:
+  - Report findings strictly as status: "OBSERVED" (describe observed state) or "UNVERIFIABLE".
+  - Never fabricate pass/fail judgments.
+
+Respond ONLY with a valid JSON object:
 {{
-  "passed": true | false,
-  "actual_result": "string describing what was actually observed",
-  "discrepancies": ["list of specific mismatches"],
-  "confidence": "high|medium|low"
+  "status": "PASS" | "FAIL" | "OBSERVED" | "UNVERIFIABLE" | "DISCREPANCY",
+  "actual_result": "detailed description of what was observed",
+  "discrepancies": ["list of specific doc vs app mismatches"],
+  "confidence": "high" | "medium" | "low"
 }}
 """
 
@@ -51,7 +62,6 @@ DOM Snippet:
 async def verify_scenario(
     client: PlaywrightClient,
     scenario: dict[str, Any],
-    expected_doc: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
     Verify the application state after a scenario executes.
@@ -65,31 +75,22 @@ async def verify_scenario(
         Dict with keys: passed, actual_result, discrepancies, confidence.
     """
     dom_snippet = await client.get_dom_snapshot()
-    doc_section = f"\n## Official Documented Behavior\n{json.dumps(expected_doc, indent=2)}" if expected_doc else ""
     prompt = VERIFIER_PROMPT.format(
-        scenario=json.dumps(scenario, indent=2) + doc_section,
+        scenario=json.dumps(scenario, indent=2),
         expected_result=scenario.get("expected_result", ""),
         url=await client.get_url(),
         title=await client.get_title(),
+        network_summary=net_summary,
+        console_summary=console_logs[:5],
         dom_snippet=dom_snippet,
     )
-    try:
-        response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
-        return parse_llm_json(
-            response,
-            fallback={
-                "passed": True,
-                "actual_result": f"Observed state on {await client.get_url()} (Title: {await client.get_title()})",
-                "discrepancies": [],
-                "confidence": "medium",
-            },
-        )
-    except Exception:
-        # Graceful fallback: inspect DOM directly for error indicators
-        has_error = "error" in dom_snippet.lower() or "not found" in dom_snippet.lower()
-        return {
-            "passed": not has_error,
-            "actual_result": f"Verified DOM state on {await client.get_url()} (Error indicator detected: {has_error})",
-            "discrepancies": ["Potential error indicator in DOM"] if has_error else [],
+    response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
+    return parse_llm_json(
+        response,
+        fallback={
+            "passed": False,
+            "actual_result": f"Verifier returned unparseable response: {response[:200]}",
+            "discrepancies": ["LLM response parse failure"],
             "confidence": "low",
-        }
+        },
+    )

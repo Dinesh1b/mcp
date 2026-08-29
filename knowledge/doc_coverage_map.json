@@ -1,0 +1,52 @@
+{
+  "getting-started": {
+    "status": "DOCUMENTED",
+    "doc_paths": [
+      "/docs/category/getting-started"
+    ],
+    "description": "System Requirements, Account Setup, Interface Overview (Inventory, Sales, Purchases, Audits, Reports)"
+  },
+  "setup-and-configuration": {
+    "status": "DOCUMENTED",
+    "doc_paths": [
+      "/docs/category/setup-and-configuration"
+    ],
+    "description": "Company & Branch Configuration, Adding User, Role Access"
+  },
+  "audit": {
+    "status": "DOCUMENTED",
+    "doc_paths": [
+      "/docs/category/audit"
+    ],
+    "description": "Dashboard, Audit Plans, Create Audit Plan, Different Audit Types & Frequencies"
+  },
+  "performing-audit": {
+    "status": "DOCUMENTED",
+    "doc_paths": [
+      "/docs/category/performing-audit"
+    ],
+    "description": "Ongoing Audits, Audit History (read-only)"
+  },
+  "inventory": {
+    "status": "DOCUMENTED",
+    "doc_paths": [
+      "/docs/category/getting-started"
+    ],
+    "description": "Item Groups, Categories, Items, Barcode Config (EAN13, Code128, QR, Splitters)"
+  },
+  "sales": {
+    "status": "UNDOCUMENTED",
+    "doc_paths": [],
+    "description": "Present in-app nav, not documented. Exploratory only."
+  },
+  "purchases": {
+    "status": "UNDOCUMENTED",
+    "doc_paths": [],
+    "description": "Present in-app nav, not documented. Exploratory only."
+  },
+  "reports": {
+    "status": "UNDOCUMENTED",
+    "doc_paths": [],
+    "description": "Present in-app nav, not documented. Exploratory only."
+  }
+}
