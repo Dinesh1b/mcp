@@ -1,0 +1,54 @@
+{
+  "module": "inventory",
+  "display_name": "Inventory & Stock Management",
+  "default_route": "/home/purchase/newpurchase",
+  "last_updated": "2026-08-29T11:20:47.447765",
+  "known_routes": [
+    "https://yellow-river-0ebeae800.2.azurestaticapps.net/#/home/purchase/newpurchase",
+    "https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login#/home/purchase/newpurchase"
+  ],
+  "stable_selectors": {
+    "search_input": "input[placeholder*='search' i], input[type='search'], .p-inputtext",
+    "table_container": "table, .p-datatable, .inventory-list, .card",
+    "create_button": "button:has-text('Add'), button:has-text('New'), button:has-text('Create')",
+    "groups_link": "text=Groups, text=Categories, text=Group List"
+  },
+  "known_workflows": [
+    "navigate_to_inventory",
+    "search_and_filter",
+    "item_groups"
+  ],
+  "discovered_forms": [
+    {
+      "name": "Item Creation Form",
+      "fields": [
+        "item_name",
+        "item_code",
+        "category",
+        "unit"
+      ]
+    }
+  ],
+  "known_defects": [
+    {
+      "defect_id": "DEF-INV-001",
+      "title": "Navigation Timeout on Network Idle for Background Analytics",
+      "severity": "medium"
+    },
+    {
+      "defect_id": "DEF-INV-002",
+      "title": "Documentation Gap on New Purchase Route Redirection",
+      "severity": "low"
+    }
+  ],
+  "execution_history": [
+    {
+      "run_id": "5a9cf7b9ce6a",
+      "timestamp": "20260829_111953",
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "defects_found": 1
+    }
+  ]
+}

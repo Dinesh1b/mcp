@@ -21,6 +21,7 @@ from workflows.login import perform_login
 async def execute_test_plan(
     test_plan: dict[str, Any],
     base_url: str | None = None,
+    execution_context: Any | None = None,
 ) -> list[dict[str, Any]]:
     """
     Execute all scenarios in the test plan and return results.
@@ -28,6 +29,7 @@ async def execute_test_plan(
     Args:
         test_plan: Structured plan from agent.planner.
         base_url: Override base URL from settings.
+        execution_context: Optional ExecutionContext for evidence registration.
 
     Returns:
         List of result dicts, one per scenario.
@@ -44,7 +46,7 @@ async def execute_test_plan(
                 results.append(_gap_result(scenario))
                 continue
 
-            result = await _run_scenario(client, scenario)
+            result = await _run_scenario(client, scenario, execution_context=execution_context)
             results.append(result)
 
     return results
@@ -53,6 +55,7 @@ async def execute_test_plan(
 async def _run_scenario(
     client: PlaywrightClient,
     scenario: dict[str, Any],
+    execution_context: Any | None = None,
 ) -> dict[str, Any]:
     """Run a single test scenario and return its result."""
     tc_id = scenario["id"]
@@ -81,7 +84,10 @@ async def _run_scenario(
             # Capture screenshot evidence
             fname = evidence_filename(tc_id, scenario["title"], "png")
             screenshot_path = await client.screenshot(fname.replace(".png", ""))
-            result["evidence"].append(str(screenshot_path))
+            path_str = str(screenshot_path)
+            result["evidence"].append(path_str)
+            if execution_context and hasattr(execution_context, "evidence_paths"):
+                execution_context.evidence_paths.append(path_str)
 
             # Analyze the failure
             result["failure_analysis"] = await analyze_failure(
@@ -94,7 +100,10 @@ async def _run_scenario(
         try:
             fname = evidence_filename(tc_id, f"blocked_{scenario['title']}", "png")
             screenshot_path = await client.screenshot(fname.replace(".png", ""))
-            result["evidence"].append(str(screenshot_path))
+            path_str = str(screenshot_path)
+            result["evidence"].append(path_str)
+            if execution_context and hasattr(execution_context, "evidence_paths"):
+                execution_context.evidence_paths.append(path_str)
         except Exception:
             pass
 
@@ -112,8 +121,14 @@ async def _execute_step(client: PlaywrightClient, step: str) -> None:
     step_lower = step.lower()
 
     if step_lower.startswith("navigate to "):
-        url = step[len("navigate to "):].strip()
-        await client.navigate(url)
+        target = step[len("navigate to "):].strip()
+        if not target.startswith("http://") and not target.startswith("https://"):
+            target_route = target if target.startswith("/") else f"/{target}"
+            if "azurestaticapps.net" in settings.base_url:
+                target = f"https://yellow-river-0ebeae800.2.azurestaticapps.net{target_route}"
+            else:
+                target = f"{settings.base_url.rstrip('/')}{target_route}"
+        await client.navigate(target)
 
     elif step_lower.startswith("click "):
         selector = step[len("click "):].strip()

@@ -14,9 +14,16 @@ from config.settings import settings
 from workflows.login import perform_login
 
 
-async def explore_application(base_url: str | None = None) -> dict[str, Any]:
+async def explore_application(
+    base_url: str | None = None,
+    module_name: str | None = None,
+) -> dict[str, Any]:
     """
     Explore the application and return a structured snapshot of its UI.
+
+    Args:
+        base_url: Base URL override.
+        module_name: Optional specific module to target (e.g. 'audit', 'inventory').
 
     Returns:
         Dict describing pages, navigation, and key elements observed.
@@ -24,6 +31,7 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
     url = base_url or settings.base_url
     exploration: dict[str, Any] = {
         "base_url": url,
+        "target_module": module_name,
         "pages": [],
     }
 

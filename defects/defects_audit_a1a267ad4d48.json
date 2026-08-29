@@ -1,0 +1,36 @@
+{
+  "module": "audit",
+  "run_id": "a1a267ad4d48",
+  "timestamp": "20260829_111840",
+  "defect_count": 1,
+  "defects": [
+    {
+      "defect_id": "DEF-AUD-001",
+      "title": "Verify Audit Management navigation and primary dashboard load",
+      "module": "audit",
+      "workflow": "functional",
+      "test_id": "TC_AUD_001",
+      "severity": "medium",
+      "priority": "P3",
+      "preconditions": [],
+      "steps_to_reproduce": [
+        "navigate to /home/audit",
+        "wait for body"
+      ],
+      "expected_result": "",
+      "actual_result": "Verified DOM state on https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login (Error indicator detected: True)",
+      "evidence_references": [
+        "C:\\Users\\HP\\Music\\playwrite\\evidence\\screenshots\\TC_AUD_001_verify_audit_management_navigation_and_primary_das.png"
+      ],
+      "console_errors": [],
+      "api_details": {},
+      "reproduction_status": "reproduced",
+      "root_cause_hypothesis": "Discrepancy observed: Verified DOM state on https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login (Error indicator detected: True)",
+      "recommended_fix": "Verify selector availability and backend service response.",
+      "reproducibility": "always",
+      "impact": "Application behavior discrepancy observed during automated execution.",
+      "run_id": "a1a267ad4d48",
+      "timestamp": "2026-08-29T11:19:24.303594"
+    }
+  ]
+}

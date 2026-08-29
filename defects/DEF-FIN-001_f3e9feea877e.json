@@ -1,0 +1,28 @@
+{
+  "defect_id": "DEF-FIN-001",
+  "title": "Verify Finance & Purchases navigation and primary dashboard load",
+  "module": "finance",
+  "workflow": "functional",
+  "test_id": "TC_FIN_001",
+  "severity": "medium",
+  "priority": "P3",
+  "preconditions": [],
+  "steps_to_reproduce": [
+    "navigate to /home/purchase/newpurchase",
+    "wait for body"
+  ],
+  "expected_result": "",
+  "actual_result": "Verified DOM state on https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login (Error indicator detected: True)",
+  "evidence_references": [
+    "C:\\Users\\HP\\Music\\playwrite\\evidence\\screenshots\\TC_FIN_001_verify_finance_&_purchases_navigation_and_primary_.png"
+  ],
+  "console_errors": [],
+  "api_details": {},
+  "reproduction_status": "reproduced",
+  "root_cause_hypothesis": "Discrepancy observed: Verified DOM state on https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login (Error indicator detected: True)",
+  "recommended_fix": "Verify selector availability and backend service response.",
+  "reproducibility": "always",
+  "impact": "Application behavior discrepancy observed during automated execution.",
+  "run_id": "f3e9feea877e",
+  "timestamp": "2026-08-29T11:21:55.345078"
+}

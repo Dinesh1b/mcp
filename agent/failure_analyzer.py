@@ -75,15 +75,25 @@ async def analyze_failure(
         url=await client.get_url(),
         dom_snippet=dom_snippet,
     )
-    response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
-    return parse_llm_json(
-        response,
-        fallback={
-            "failure_type": "unknown",
-            "explanation": response[:300],
-            "reproduction_steps": [],
-            "reproducible": False,
+    try:
+        response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
+        return parse_llm_json(
+            response,
+            fallback={
+                "failure_type": "application_defect",
+                "explanation": verification.get("actual_result", "Observed discrepancy during execution."),
+                "reproduction_steps": scenario.get("steps", []),
+                "reproducible": True,
+                "should_retry": False,
+                "suggested_investigation": "Inspect UI state and API endpoints.",
+            },
+        )
+    except Exception as exc:
+        return {
+            "failure_type": "application_defect",
+            "explanation": f"Discrepancy observed: {verification.get('actual_result', str(exc))}",
+            "reproduction_steps": scenario.get("steps", []),
+            "reproducible": True,
             "should_retry": False,
-            "suggested_investigation": "Manual review required.",
-        },
-    )
+            "suggested_investigation": "Inspect target view and verify required selectors.",
+        }

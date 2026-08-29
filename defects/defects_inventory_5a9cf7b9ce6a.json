@@ -1,0 +1,36 @@
+{
+  "module": "inventory",
+  "run_id": "5a9cf7b9ce6a",
+  "timestamp": "20260829_111953",
+  "defect_count": 1,
+  "defects": [
+    {
+      "defect_id": "DEF-INV-001",
+      "title": "Verify Inventory & Stock Management navigation and primary dashboard load",
+      "module": "inventory",
+      "workflow": "functional",
+      "test_id": "TC_INV_001",
+      "severity": "medium",
+      "priority": "P3",
+      "preconditions": [],
+      "steps_to_reproduce": [
+        "navigate to /home/purchase/newpurchase",
+        "wait for body"
+      ],
+      "expected_result": "",
+      "actual_result": "Verified DOM state on https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login (Error indicator detected: True)",
+      "evidence_references": [
+        "C:\\Users\\HP\\Music\\playwrite\\evidence\\screenshots\\TC_INV_001_verify_inventory_&_stock_management_navigation_and.png"
+      ],
+      "console_errors": [],
+      "api_details": {},
+      "reproduction_status": "reproduced",
+      "root_cause_hypothesis": "Discrepancy observed: Verified DOM state on https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login (Error indicator detected: True)",
+      "recommended_fix": "Verify selector availability and backend service response.",
+      "reproducibility": "always",
+      "impact": "Application behavior discrepancy observed during automated execution.",
+      "run_id": "5a9cf7b9ce6a",
+      "timestamp": "2026-08-29T11:20:47.388493"
+    }
+  ]
+}

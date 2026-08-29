@@ -1,0 +1,36 @@
+{
+  "module": "finance",
+  "display_name": "Finance & Purchases",
+  "default_route": "/home/purchase/newpurchase",
+  "last_updated": "2026-08-29T11:21:55.379022",
+  "known_routes": [
+    "https://yellow-river-0ebeae800.2.azurestaticapps.net/#/home/purchase/newpurchase",
+    "https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login#/home/purchase/newpurchase"
+  ],
+  "stable_selectors": {
+    "save_button": "button:has-text('Save'), button:has-text('Submit'), button[type='submit']"
+  },
+  "known_workflows": [
+    "navigate_to_finance",
+    "purchase_validation"
+  ],
+  "discovered_forms": [],
+  "known_defects": [
+    {
+      "defect_id": "DEF-FIN-001",
+      "title": "Verify Finance & Purchases navigation and primary dashboard load",
+      "severity": "medium",
+      "discovered_in_run": "f3e9feea877e"
+    }
+  ],
+  "execution_history": [
+    {
+      "run_id": "f3e9feea877e",
+      "timestamp": "20260829_112059",
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "defects_found": 1
+    }
+  ]
+}

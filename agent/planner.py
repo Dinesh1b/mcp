@@ -58,21 +58,49 @@ Respond ONLY with a valid JSON object matching this schema:
 async def generate_test_plan(
     requirement: str,
     exploration_data: dict[str, Any],
+    module_memory: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """
-    Use the LLM to generate a structured test plan from a requirement
-    and the application exploration data.
+    Use the LLM to generate a structured test plan from a requirement,
+    application exploration data, and persistent module memory.
 
     Args:
         requirement: Free-text testing requirement (e.g. "Test Item Import in Inventory").
         exploration_data: Dict produced by the ApplicationExplorer.
+        module_memory: Optional persistent knowledge about this module.
 
     Returns:
         Parsed JSON test plan dict.
     """
+    memory_section = f"\n## Module Memory / Historical Knowledge\n{json.dumps(module_memory or {}, indent=2)}" if module_memory else ""
     prompt = PLANNER_PROMPT.format(
         requirement=requirement,
-        exploration_data=json.dumps(exploration_data, indent=2),
+        exploration_data=json.dumps(exploration_data, indent=2) + memory_section,
     )
-    response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
-    return parse_llm_json(response)
+
+    try:
+        response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
+        return parse_llm_json(response)
+    except Exception as exc:
+        # Fallback default plan based on requirement/module memory
+        mod_key = (module_memory or {}).get("module", "audit").lower()
+        mod_title = (module_memory or {}).get("display_name", mod_key.title())
+        route = (module_memory or {}).get("default_route", f"/home/{mod_key}")
+        
+        return {
+            "module": mod_key,
+            "feature": requirement,
+            "testing_types": ["functional", "validation", "ui"],
+            "scenarios": [
+                {
+                    "id": f"TC_{mod_key[:3].upper()}_001",
+                    "title": f"Verify {mod_title} navigation and primary dashboard load",
+                    "type": "functional",
+                    "preconditions": ["User is authenticated"],
+                    "steps": [f"navigate to {route}", "wait for body"],
+                    "expected_result": f"{mod_title} view is rendered and title is populated",
+                    "status": "PLANNED",
+                }
+            ],
+            "fallback_reason": str(exc),
+        }

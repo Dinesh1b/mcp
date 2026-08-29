@@ -1,0 +1,86 @@
+{
+  "module": "audit",
+  "display_name": "Audit Management",
+  "default_route": "/home/audit",
+  "last_updated": "2026-08-29T11:19:24.323577",
+  "known_routes": [
+    "https://yellow-river-0ebeae800.2.azurestaticapps.net/authorization/login#/home/purchase/newpurchase",
+    "https://yellow-river-0ebeae800.2.azurestaticapps.net/home/audit"
+  ],
+  "stable_selectors": {
+    "create_audit_button": "button:has-text('Create Audit')",
+    "manual_tab": "text='Manual'",
+    "quick_audit_option": "text='Quick Audit'",
+    "continue_button": "button:has-text('Continue')",
+    "audit_name_input": "input[placeholder='Enter audit name']",
+    "import_stock_sheet_button": "text='Import Stock Sheet'",
+    "file_input": "input[type='file']",
+    "steps_tracker": "text='STEPS TO COMPLETE THE AUDIT'"
+  },
+  "known_workflows": [
+    "navigate_to_audit",
+    "create_quick_audit",
+    "import_stock_sheet",
+    "verify_audit_tracker"
+  ],
+  "discovered_forms": [
+    {
+      "name": "Create Audit Dialog",
+      "fields": [
+        "audit_name",
+        "audit_type",
+        "auditors"
+      ]
+    }
+  ],
+  "known_defects": [
+    {
+      "defect_id": "DEF-AUD-001",
+      "title": "Verify Audit Management navigation and primary dashboard load",
+      "severity": "medium",
+      "discovered_in_run": "a1a267ad4d48"
+    }
+  ],
+  "execution_history": [
+    {
+      "run_id": "ed14c1129411",
+      "timestamp": "20260829_111423",
+      "total": 1,
+      "passed": 0,
+      "failed": 0,
+      "defects_found": 0
+    },
+    {
+      "run_id": "ae5d6c97726b",
+      "timestamp": "20260829_111551",
+      "total": 1,
+      "passed": 0,
+      "failed": 0,
+      "defects_found": 0
+    },
+    {
+      "run_id": "3d823189e8ff",
+      "timestamp": "20260829_111653",
+      "total": 1,
+      "passed": 0,
+      "failed": 0,
+      "defects_found": 0
+    },
+    {
+      "run_id": "4f9f768a1188",
+      "timestamp": "20260829_111759",
+      "total": 0,
+      "passed": 0,
+      "failed": 0,
+      "defects_found": 0
+    },
+    {
+      "run_id": "a1a267ad4d48",
+      "timestamp": "20260829_111840",
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "defects_found": 1
+    }
+  ]
+}

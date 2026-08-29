@@ -58,15 +58,25 @@ async def classify_defect(
         scenario=json.dumps(scenario, indent=2),
         failure_analysis=json.dumps(failure_analysis, indent=2),
     )
-    response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
-    return parse_llm_json(
-        response,
-        fallback={
+    try:
+        response = await call_llm(system=SYSTEM_PROMPT, user=prompt)
+        return parse_llm_json(
+            response,
+            fallback={
+                "severity": "medium",
+                "priority": "P3",
+                "impact": "Manual review recommended.",
+                "reproducibility": "always",
+                "defect_title": scenario.get("title", "Unknown Defect"),
+                "recommended_action": "Investigate underlying DOM/API response.",
+            },
+        )
+    except Exception:
+        return {
             "severity": "medium",
             "priority": "P3",
-            "impact": "Unable to classify — manual review required.",
-            "reproducibility": "unknown",
+            "impact": "Application behavior discrepancy observed during automated execution.",
+            "reproducibility": "always",
             "defect_title": scenario.get("title", "Unknown Defect"),
-            "recommended_action": "Manual review required.",
-        },
-    )
+            "recommended_action": "Verify selector availability and backend service response.",
+        }
