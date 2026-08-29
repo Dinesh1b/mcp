@@ -24,14 +24,19 @@ from agent.memory_store import ModuleMemoryStore
 from workflows.login import perform_login
 
 
-async def explore_application(base_url: str | None = None) -> dict[str, Any]:
+async def explore_application(
+    base_url: str | None = None,
+    target_module: str | None = None,
+    max_pages_per_module: int = 5,
+) -> dict[str, Any]:
     """
     Explore the live application, reconcile against doc coverage,
     and update persistent module memory stores.
 
     Args:
         base_url: Base URL override.
-        module_name: Optional specific module to target (e.g. 'audit', 'inventory').
+        target_module: Optional specific module to target (e.g. 'audit', 'inventory').
+        max_pages_per_module: Maximum sub-pages to crawl per module.
 
     Returns:
         Structured exploration data dictionary.
@@ -41,7 +46,10 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
 
     exploration: dict[str, Any] = {
         "base_url": url,
+        "target_module": target_module,
         "pages": [],
+        "nav_modules": [],
+        "modules_discovered": [],
         "discrepancies": [],
     }
 
@@ -70,7 +78,7 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
             doc_status = cov.get("status", "UNDOCUMENTED")
             memory = ModuleMemoryStore(mod_name)
 
-            mod_entry = {
+            mod_entry: dict[str, Any] = {
                 "module": mod_name,
                 "doc_status": doc_status,
                 "selector": mod["selector"],
@@ -82,22 +90,22 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
                 client.clear_logs()
                 await client.click(mod["selector"])
                 await client.wait_for_network_idle()
-                
+
                 # Start Bounded Module Crawl
                 module_base_url = await client.get_url()
-                visited_urls = set()
-                to_visit = [module_base_url]
-                
-                hierarchy = {"name": mod_name, "children": []}
+                visited_urls: set[str] = set()
+                to_visit: list[str] = [module_base_url]
+
+                hierarchy: dict[str, Any] = {"name": mod_name, "children": []}
 
                 while to_visit and len(visited_urls) < max_pages_per_module:
                     current_url = to_visit.pop(0)
                     if current_url in visited_urls:
                         continue
-                        
+
                     await client.navigate(current_url)
                     await client.wait_for_network_idle()
-                    
+
                     visited_urls.add(current_url)
 
                     # Take exploration screenshot
@@ -117,7 +125,7 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
 
                     # Update module persistent memory
                     memory.add_or_update_page(page_data)
-                    
+
                     # Extract intra-module links for further crawling
                     links = await client.page.query_selector_all("a[href]")
                     for link in links:
@@ -138,7 +146,7 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
                                 status=net.get("status", 200),
                                 action=f"Navigate to {current_url}",
                             )
-                            
+
                 # Update module map hierarchy
                 memory.module_map["hierarchy"] = hierarchy
                 memory.save()
@@ -151,14 +159,14 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
                         observed_elements = []
                         for p in mod_entry["pages"]:
                             observed_elements.extend([el.get("text", "") for el in p.get("interactive_elements", [])])
-                            
+
                         for exp in expected_elements[:3]:
                             if not any(exp.lower() in obs.lower() for obs in observed_elements if obs):
                                 disc_title = f"Potential missing element in {mod_name}: '{exp}'"
                                 memory.record_discrepancy(
                                     title=disc_title,
                                     documented_expectation=f"Docs mention element: {exp}",
-                                    actual_behavior=f"Element not found in discovered pages",
+                                    actual_behavior="Element not found in discovered pages",
                                 )
                                 exploration["discrepancies"].append({
                                     "module": mod_name,
@@ -172,20 +180,21 @@ async def explore_application(base_url: str | None = None) -> dict[str, Any]:
 
     return exploration
 
+
 def _is_within_module(base_url: str, target_url: str) -> bool:
     """Check if target_url belongs to the same logical path as base_url."""
     base_parsed = urlparse(base_url)
     target_parsed = urlparse(target_url)
-    
+
     if base_parsed.netloc != target_parsed.netloc:
         return False
-        
-    # Example heuristic: if base is /sales, target must start with /sales
+
     base_path = base_parsed.path.rstrip('/')
     if not base_path:
-        return True # if base is root, everything is in module
-        
+        return True
+
     return target_parsed.path.startswith(base_path)
+
 
 async def _capture_page_state(
     client: PlaywrightClient,
@@ -210,6 +219,7 @@ async def _capture_page_state(
         "screenshot": screenshot_path,
         "dom_snippet": (await client.get_dom_snapshot())[:2500],
     }
+
 
 async def _discover_nav_modules(client: PlaywrightClient) -> list[dict[str, Any]]:
     """Discover top-level navigation items."""

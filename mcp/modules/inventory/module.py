@@ -27,7 +27,7 @@ class InventoryModule(BaseModule):
 
     @property
     def default_route(self) -> str:
-        return "/home/purchase/newpurchase"
+        return "/home/inventory"
 
     def get_workflows(self) -> dict[str, list[Any]]:
         return {

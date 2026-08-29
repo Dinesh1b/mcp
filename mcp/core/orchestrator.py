@@ -222,7 +222,7 @@ class Orchestrator:
         })
 
     async def _stage_execute_tests(self) -> StageResult:
-        """Execute generated test scenarios."""
+        """Stage 6: Execute generated test scenarios and capture live state."""
         from agent.executor import execute_test_plan
 
         results = await execute_test_plan(
@@ -232,22 +232,16 @@ class Orchestrator:
         )
         self.ctx.test_results = results
         return StageResult(PipelineStage.EXECUTE_TESTS, data={
-            "total": len(results),
-            "passed": sum(1 for r in results if r.get("status") == "PASS"),
-            "failed": sum(1 for r in results if r.get("status") == "FAIL"),
+            "total_executed": len(results),
+            "scenarios_executed": [r.get("id") for r in results],
         })
 
     async def _stage_validate_results(self) -> StageResult:
-        """Post-execution validation (already done inline by executor)."""
-        # Validation is performed inline during execution via agent/verifier.py.
-        # This stage is a checkpoint confirming validation was completed.
-        validated = sum(
-            1 for r in self.ctx.test_results
-            if r.get("actual_result")
-        )
-        return StageResult(PipelineStage.VALIDATE_RESULTS, data={
-            "validated_count": validated,
-        })
+        """Stage 7: Independently validate executed scenario results against specs."""
+        from mcp.agents.validation_agent import run_validation_agent
+
+        val_summary = await run_validation_agent(self.ctx)
+        return StageResult(PipelineStage.VALIDATE_RESULTS, data=val_summary)
 
     async def _stage_capture_evidence(self) -> StageResult:
         """Consolidate evidence references."""

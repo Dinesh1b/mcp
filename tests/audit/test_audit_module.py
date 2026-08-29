@@ -8,13 +8,15 @@ from __future__ import annotations
 import pytest
 from playwright.async_api import Page
 from config.settings import settings
+from mcp.core.routing import resolve_module_url
 
 
 @pytest.mark.asyncio
 async def test_01_audit_navigation(authenticated_page: Page):
     """TC_AUD_001: Navigate to Audit module and verify page load."""
     page = authenticated_page
-    await page.goto("https://yellow-river-0ebeae800.2.azurestaticapps.net/home/audit", wait_until="domcontentloaded")
+    audit_url = resolve_module_url(settings.base_url, "/home/audit")
+    await page.goto(audit_url, wait_until="domcontentloaded")
     await page.wait_for_timeout(2000)
     title = await page.title()
     assert title is not None, "Page title should not be None"
@@ -25,7 +27,8 @@ async def test_01_audit_navigation(authenticated_page: Page):
 async def test_02_create_audit_dialog_presence(authenticated_page: Page):
     """TC_AUD_002: Verify Create Audit modal button and dialog triggers."""
     page = authenticated_page
-    await page.goto("https://yellow-river-0ebeae800.2.azurestaticapps.net/home/audit", wait_until="domcontentloaded")
+    audit_url = resolve_module_url(settings.base_url, "/home/audit")
+    await page.goto(audit_url, wait_until="domcontentloaded")
     await page.wait_for_timeout(2000)
     
     create_btn = page.locator("button:has-text('Create Audit')").first
@@ -40,7 +43,8 @@ async def test_02_create_audit_dialog_presence(authenticated_page: Page):
 async def test_03_quick_audit_form_validation(authenticated_page: Page):
     """TC_AUD_003: Verify Quick Audit form controls and creation."""
     page = authenticated_page
-    await page.goto("https://yellow-river-0ebeae800.2.azurestaticapps.net/home/audit", wait_until="domcontentloaded")
+    audit_url = resolve_module_url(settings.base_url, "/home/audit")
+    await page.goto(audit_url, wait_until="domcontentloaded")
     await page.wait_for_timeout(2000)
     
     create_btn = page.locator("button:has-text('Create Audit')").first

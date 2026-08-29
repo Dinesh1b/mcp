@@ -6,6 +6,7 @@ from mcp.core.module_registry import ModuleRegistry, module_registry
 from mcp.core.agent_registry import AgentRegistry, agent_registry
 from mcp.core.workflow_engine import WorkflowEngine
 from mcp.core.orchestrator import Orchestrator
+from mcp.core.routing import resolve_module_url
 
 __all__ = [
     "PipelineStage",
@@ -17,4 +18,5 @@ __all__ = [
     "agent_registry",
     "WorkflowEngine",
     "Orchestrator",
+    "resolve_module_url",
 ]
