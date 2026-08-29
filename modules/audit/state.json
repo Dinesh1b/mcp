@@ -1,7 +1,7 @@
 {
   "module_name": "audit",
   "doc_status": "DOCUMENTED",
-  "last_updated": "2026-08-29T11:56:35.014598",
+  "last_updated": "2026-08-29T11:58:22.788013",
   "pages": [],
   "selectors": {},
   "apis": [],
@@ -20,6 +20,13 @@
         "feature": "Test the audit module.",
         "results_count": 1
       }
+    },
+    {
+      "timestamp": "2026-08-29T11:57:49.586475",
+      "summary": {
+        "feature": "Test the audit module.",
+        "results_count": 1
+      }
     }
   ],
   "known_failures": [],
@@ -30,6 +37,13 @@
       "actual_behavior": "Edit button is visible",
       "evidence": {},
       "recorded_at": "2026-08-20T23:02:09.604922"
+    },
+    {
+      "title": "Test Discrepancy",
+      "documented_expectation": "Audit history should have no edit button",
+      "actual_behavior": "Edit button is visible",
+      "evidence": {},
+      "recorded_at": "2026-08-29T11:58:22.787990"
     }
   ]
 }

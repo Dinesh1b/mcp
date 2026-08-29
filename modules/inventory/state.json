@@ -1,7 +1,7 @@
 {
   "module_name": "inventory",
   "doc_status": "DOCUMENTED",
-  "last_updated": "2026-08-20T23:02:09.626233",
+  "last_updated": "2026-08-29T11:58:23.646014",
   "pages": [],
   "selectors": {},
   "apis": [
@@ -14,7 +14,22 @@
     }
   ],
   "known_flows": [],
-  "prior_results": [],
+  "prior_results": [
+    {
+      "timestamp": "2026-08-29T11:57:17.256388",
+      "summary": {
+        "feature": "Test the inventory module.",
+        "results_count": 1
+      }
+    },
+    {
+      "timestamp": "2026-08-29T11:58:23.645989",
+      "summary": {
+        "feature": "Test the inventory module.",
+        "results_count": 1
+      }
+    }
+  ],
   "known_failures": [],
   "discrepancies": []
 }
